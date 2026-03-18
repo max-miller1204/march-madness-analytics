@@ -143,12 +143,6 @@ def main() -> int:
     if not plan_path:
         return 0
 
-    # Only archive if the plan was modified in the last 10 minutes
-    # This catches plans from the previous session that just ended
-    age_seconds = time.time() - mtime
-    if age_seconds > 600:  # 10 minutes
-        return 0
-
     # Read the plan content
     try:
         content = plan_path.read_text(encoding="utf-8").strip()

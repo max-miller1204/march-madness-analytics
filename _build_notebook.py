@@ -31,8 +31,8 @@ cells = []
 # ==============================================================
 cells.append(md("title", r"""# March Madness 2026: Data-Driven Final Four Analysis
 
-A composite analytical pipeline using KenPom efficiency metrics, NET rankings,
-quad records, Monte Carlo bracket simulation, and seed-constraint optimization.
+A composite analytical pipeline using KenPom efficiency metrics, real NCAA NET rankings,
+committee metrics (SOR, WAB, KPI, BPI), quad records, Monte Carlo bracket simulation, and seed-constraint optimization.
 
 **Seed constraint:** Sum of seeds >= 15 | **Method:** Composite model -> 10K Monte Carlo sims -> Brute-force optimization"""))
 
@@ -45,9 +45,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from matplotlib.lines import Line2D
 import seaborn as sns
-import requests
-from bs4 import BeautifulSoup
-import re, os, time, warnings
+import re, os, warnings
 from itertools import product as iterproduct
 from collections import defaultdict
 
@@ -108,7 +106,8 @@ Resolve play-in games, normalize team names across sources, and merge bracket st
 cells.append(code("load-bracket", r"""bracket = pd.read_csv('bracket.csv')
 
 # KenPom name -> standard/bracket name
-KENPOM_TO_STD = {
+# Canonical name mapping: variant -> standard bracket name (shared across all data sources)
+NAME_ALIASES = {
     'Michigan St.': 'Michigan State', 'Iowa St.': 'Iowa State',
     'Ohio St.': 'Ohio State', 'Connecticut': 'UConn',
     'Utah St.': 'Utah State', 'Miami FL': 'Miami (FL)',
@@ -116,8 +115,14 @@ KENPOM_TO_STD = {
     'Wright St.': 'Wright State', 'Kennesaw St.': 'Kennesaw State',
     'Miami OH': 'Miami (OH)', 'Tennessee St.': 'Tennessee State',
     'LIU': 'Long Island University', 'Queens': 'Queens (NC)',
+    'South Fla.': 'South Florida', 'UNI': 'Northern Iowa',
+    'California Baptist': 'Cal Baptist',
+    "Saint Mary's (CA)": "Saint Mary's", "St. John's (NY)": "St. John's",
+    'Long Island': 'Long Island University',
+    "Saint Mary's College": "Saint Mary's", "Saint John's": "St. John's",
+    'North Carolina State': 'NC State',
 }
-kenpom['StdName'] = kenpom['TeamName'].replace(KENPOM_TO_STD)
+kenpom['StdName'] = kenpom['TeamName'].replace(NAME_ALIASES)
 
 # Play-in resolutions (winner projected by KenPom rank)
 PLAYIN = {
@@ -166,178 +171,104 @@ df.sort_values('Rk')[['StdName', 'Region', 'Seed', 'Rk', 'NetRtg', 'ORtg', 'DRtg
 # ==============================================================
 # CELL: Section 4 Header
 # ==============================================================
-cells.append(md("s4-hdr", r"""## 4. Scrape NET Rankings & Quad Records
+cells.append(md("s4-hdr", r"""## 4. Load NET Rankings & Tournament Team Metrics
 
-Scrape Warren Nolan for NET rankings and per-team quad records (Q1-Q4 win-loss).
-Results are cached to `scraped_data/` so re-runs skip scraping.
-
-**Fallback:** If scraping fails, KenPom rank proxies for NET rank and composite weights are redistributed."""))
+Load real NCAA NET rankings and rich team-sheet metrics (KPI, SOR, WAB, BPI) from CSV files.
+This replaces web scraping with reliable local data and adds truly independent metrics beyond KenPom."""))
 
 # ==============================================================
 # CELL: Scrape + Cache
 # ==============================================================
-cells.append(code("scrape", r"""NET_CACHE = os.path.join(SCRAPED_DIR, 'net_rankings.csv')
-QUAD_CACHE = os.path.join(SCRAPED_DIR, 'quad_records.csv')
-HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+cells.append(code("load-metrics", r"""# --- Load NET Rankings from CSV (all 365 D1 teams) ---
+NET_CSV = 'ncaa-net-rankings.csv'
+TEAM_SHEET_CSV = os.path.join(SCRAPED_DIR, 'tournament_teams.csv')
 
 has_net = False
-has_quad = False
+has_teamsheet = False
 
-# --- NET Rankings ---
-if os.path.exists(NET_CACHE):
-    net_df = pd.read_csv(NET_CACHE)
+
+if os.path.exists(NET_CSV):
+    net_df = pd.read_csv(NET_CSV)
+    net_df['School'] = net_df['School'].str.strip()
+    net_df['StdName'] = net_df['School'].replace(NAME_ALIASES)
     has_net = True
-    print(f'Loaded cached NET rankings ({len(net_df)} teams)')
+    print(f'Loaded NET rankings: {len(net_df)} teams from {NET_CSV}')
+
+    # Parse quad records from NET CSV (format: "17-2") using vectorized str.extract
+    def parse_wl(series):
+        parsed = series.str.extract(r'(\d+)-(\d+)')
+        w = pd.to_numeric(parsed[0], errors='coerce').fillna(0).astype(int)
+        l = pd.to_numeric(parsed[1], errors='coerce').fillna(0).astype(int)
+        return w, l
+    net_df['Q1_W'], net_df['Q1_L'] = parse_wl(net_df['Quad 1'])
+    net_df['Q2_W'], net_df['Q2_L'] = parse_wl(net_df['Quad 2'])
+    net_df['Q1_WinPct'] = net_df['Q1_W'] / (net_df['Q1_W'] + net_df['Q1_L']).replace(0, np.nan)
+    net_df['Q1_WinPct'] = net_df['Q1_WinPct'].fillna(0)
+    q1q2_total = net_df['Q1_W'] + net_df['Q2_W'] + net_df['Q1_L'] + net_df['Q2_L']
+    net_df['Q1Q2_WinPct'] = (net_df['Q1_W'] + net_df['Q2_W']) / q1q2_total.replace(0, np.nan)
+    net_df['Q1Q2_WinPct'] = net_df['Q1Q2_WinPct'].fillna(0)
 else:
-    print('Scraping NET rankings from Warren Nolan...')
-    try:
-        resp = requests.get('https://www.warrennolan.com/basketball/2026/net',
-                           headers=HEADERS, timeout=15)
-        resp.raise_for_status()
-        soup = BeautifulSoup(resp.text, 'lxml')
+    print(f'WARNING: {NET_CSV} not found - using KenPom rank as NET proxy')
 
-        tables = soup.find_all('table')
-        net_data = []
-
-        for table in tables:
-            trs = table.find_all('tr')
-            if len(trs) < 20:
-                continue
-            for tr in trs[1:]:
-                cells_html = tr.find_all(['td', 'th'])
-                if len(cells_html) >= 2:
-                    rank_text = cells_html[0].get_text(strip=True)
-                    team_text = cells_html[1].get_text(strip=True)
-                    try:
-                        rank = int(rank_text)
-                        if 1 <= rank <= 400 and team_text:
-                            net_data.append({'NET_Team': team_text, 'NET_Rank': rank})
-                    except ValueError:
-                        continue
-            if net_data:
-                break
-
-        if net_data:
-            net_df = pd.DataFrame(net_data)
-            net_df.to_csv(NET_CACHE, index=False)
-            has_net = True
-            print(f'Scraped {len(net_df)} NET rankings')
-        else:
-            print('Could not parse NET rankings table')
-    except Exception as e:
-        print(f'NET scraping failed: {e}')
-
-# --- Quad Records ---
-if os.path.exists(QUAD_CACHE):
-    quad_df = pd.read_csv(QUAD_CACHE)
-    has_quad = True
-    print(f'Loaded cached quad records ({len(quad_df)} teams)')
+# --- Load tournament team sheet metrics (KPI, SOR, WAB, BPI, etc.) ---
+if os.path.exists(TEAM_SHEET_CSV):
+    ts_df = pd.read_csv(TEAM_SHEET_CSV)
+    ts_df['StdName'] = ts_df['team'].replace(NAME_ALIASES)
+    has_teamsheet = True
+    print(f'Loaded tournament team sheets: {len(ts_df)} teams from {TEAM_SHEET_CSV}')
 else:
-    WN_SLUGS = {
-        'Duke': 'Duke', 'Arizona': 'Arizona', 'Michigan': 'Michigan',
-        'Florida': 'Florida', 'Houston': 'Houston', 'Iowa State': 'Iowa-State',
-        'Illinois': 'Illinois', 'Purdue': 'Purdue', 'Michigan State': 'Michigan-State',
-        'Gonzaga': 'Gonzaga', 'UConn': 'Connecticut', 'Vanderbilt': 'Vanderbilt',
-        'Virginia': 'Virginia', 'Nebraska': 'Nebraska', 'Arkansas': 'Arkansas',
-        'Tennessee': 'Tennessee', "St. John's": 'St-Johns', 'Alabama': 'Alabama',
-        'Louisville': 'Louisville', 'Texas Tech': 'Texas-Tech', 'Kansas': 'Kansas',
-        'Wisconsin': 'Wisconsin', 'BYU': 'BYU', "Saint Mary's": 'Saint-Marys',
-        'Iowa': 'Iowa', 'Ohio State': 'Ohio-State', 'UCLA': 'UCLA',
-        'Kentucky': 'Kentucky', 'North Carolina': 'North-Carolina',
-        'Utah State': 'Utah-State', 'Miami (FL)': 'Miami-FL', 'Georgia': 'Georgia',
-        'Villanova': 'Villanova', 'NC State': 'NC-State', 'Santa Clara': 'Santa-Clara',
-        'Clemson': 'Clemson', 'Texas A&M': 'Texas-AM', 'Saint Louis': 'Saint-Louis',
-        'SMU': 'SMU', 'TCU': 'TCU', 'VCU': 'VCU', 'South Florida': 'South-Florida',
-        'Missouri': 'Missouri', 'UCF': 'UCF', 'Akron': 'Akron', 'McNeese': 'McNeese',
-        'Northern Iowa': 'Northern-Iowa', 'Hofstra': 'Hofstra',
-        'High Point': 'High-Point', 'Cal Baptist': 'Cal-Baptist', 'Hawaii': 'Hawaii',
-        'North Dakota State': 'North-Dakota-State', 'Wright State': 'Wright-State',
-        'Troy': 'Troy', 'Idaho': 'Idaho', 'Penn': 'Penn',
-        'Kennesaw State': 'Kennesaw-State', 'Queens (NC)': 'Queens',
-        'Tennessee State': 'Tennessee-State', 'UMBC': 'UMBC', 'Furman': 'Furman',
-        'Siena': 'Siena', 'Howard': 'Howard', 'Long Island University': 'LIU',
-        'Lehigh': 'Lehigh',
-    }
+    print(f'WARNING: {TEAM_SHEET_CSV} not found - SOR/WAB/KPI metrics unavailable')
 
-    print('Scraping quad records from Warren Nolan team sheets...')
-    quad_data = []
-    teams_to_scrape = df['StdName'].tolist()
-
-    for i, team in enumerate(teams_to_scrape):
-        slug = WN_SLUGS.get(team, team.replace(' ', '-').replace("'", '').replace('(', '').replace(')', ''))
-        urls = [
-            f'https://www.warrennolan.com/basketball/2026/team-sheet?team={slug}',
-            f'https://www.warrennolan.com/basketball/2026/team-sheet/{slug}',
-        ]
-
-        for url in urls:
-            try:
-                resp = requests.get(url, headers=HEADERS, timeout=10)
-                if resp.status_code != 200:
-                    continue
-                soup = BeautifulSoup(resp.text, 'lxml')
-                text = soup.get_text()
-
-                q1_match = re.search(r'Q(?:uad\s*)?1[:\s]+(\d+)-(\d+)', text, re.IGNORECASE)
-                q2_match = re.search(r'Q(?:uad\s*)?2[:\s]+(\d+)-(\d+)', text, re.IGNORECASE)
-
-                if q1_match:
-                    q1_w, q1_l = int(q1_match.group(1)), int(q1_match.group(2))
-                    q2_w = int(q2_match.group(1)) if q2_match else 0
-                    q2_l = int(q2_match.group(2)) if q2_match else 0
-                    q1_pct = q1_w / (q1_w + q1_l) if (q1_w + q1_l) > 0 else 0
-                    q1q2_total = q1_w + q2_w + q1_l + q2_l
-                    q1q2_pct = (q1_w + q2_w) / q1q2_total if q1q2_total > 0 else 0
-                    quad_data.append({
-                        'StdName': team, 'Q1_W': q1_w, 'Q1_L': q1_l,
-                        'Q1_WinPct': round(q1_pct, 3),
-                        'Q2_W': q2_w, 'Q2_L': q2_l,
-                        'Q1Q2_WinPct': round(q1q2_pct, 3)
-                    })
-                    break
-            except Exception:
-                continue
-
-        if (i + 1) % 10 == 0:
-            print(f'  Processed {i + 1}/{len(teams_to_scrape)} teams...')
-        time.sleep(0.5)
-
-    if quad_data:
-        quad_df = pd.DataFrame(quad_data)
-        quad_df.to_csv(QUAD_CACHE, index=False)
-        has_quad = True
-        print(f'Scraped quad records for {len(quad_df)} teams')
-    else:
-        print('Quad record scraping returned no data - using fallback weights')
-
-# --- Merge scraped data ---
+# --- Merge NET rankings ---
 if has_net:
-    net_map = {}
-    for std_name in df['StdName'].values:
-        for _, net_row in net_df.iterrows():
-            net_name = str(net_row['NET_Team'])
-            if (std_name.lower() == net_name.lower() or
-                std_name.lower() in net_name.lower() or
-                net_name.lower() in std_name.lower()):
-                net_map[std_name] = net_row['NET_Rank']
-                break
-    df['NET_Rank'] = df['StdName'].map(net_map)
+    net_merge = net_df[['StdName', 'Rank', 'Q1_W', 'Q1_L', 'Q1_WinPct', 'Q2_W', 'Q2_L', 'Q1Q2_WinPct']].copy()
+    net_merge = net_merge.rename(columns={'Rank': 'NET_Rank'})
+    df = df.merge(net_merge, on='StdName', how='left')
     matched = df['NET_Rank'].notna().sum()
     print(f'Matched {matched}/{len(df)} teams with NET rankings')
     df['NET_Rank'] = df['NET_Rank'].fillna(df['Rk'])
-else:
-    print('Using KenPom rank as proxy for NET rank')
-    df['NET_Rank'] = df['Rk'].astype(float)
-
-if has_quad:
-    df = df.merge(quad_df, on='StdName', how='left')
     df['Q1_WinPct'] = df['Q1_WinPct'].fillna(0)
     df['Q1Q2_WinPct'] = df['Q1Q2_WinPct'].fillna(0)
 else:
-    df['Q1_WinPct'] = np.nan
-    df['Q1Q2_WinPct'] = np.nan
+    df['NET_Rank'] = df['Rk'].astype(float)
+    df['Q1_WinPct'] = 0.0
+    df['Q1Q2_WinPct'] = 0.0
+    df['Q1_W'] = np.nan
+    df['Q1_L'] = np.nan
 
-print(f'\nData ready: {len(df)} teams, metrics: {"full" if (has_net and has_quad) else "partial (fallback weights)"}')"""))
+# --- Merge team sheet metrics (SOR, WAB, KPI, BPI, NET SOS) ---
+if has_teamsheet:
+    ts_cols = ts_df[['StdName', 'net_sos', 'kpi', 'sor', 'wab', 'bpi', 'avg_net_wins', 'avg_net_losses']].copy()
+    ts_cols = ts_cols.rename(columns={
+        'net_sos': 'NET_SOS', 'kpi': 'KPI', 'sor': 'SOR',
+        'wab': 'WAB', 'bpi': 'BPI',
+        'avg_net_wins': 'Avg_NET_Wins', 'avg_net_losses': 'Avg_NET_Losses',
+    })
+    for col in ['NET_SOS', 'KPI', 'SOR', 'WAB', 'BPI', 'Avg_NET_Wins', 'Avg_NET_Losses']:
+        ts_cols[col] = pd.to_numeric(ts_cols[col], errors='coerce')
+    df = df.merge(ts_cols, on='StdName', how='left')
+    ts_matched = df['SOR'].notna().sum()
+    print(f'Matched {ts_matched}/{len(df)} teams with team sheet metrics (SOR/WAB/KPI/BPI)')
+    if ts_matched < len(df):
+        missing_ts = df[df['SOR'].isna()]['StdName'].tolist()
+        print(f'  Missing: {missing_ts}')
+else:
+    for col in ['NET_SOS', 'KPI', 'SOR', 'WAB', 'BPI', 'Avg_NET_Wins', 'Avg_NET_Losses']:
+        df[col] = np.nan
+
+has_quad = has_net and df['Q1_WinPct'].sum() > 0
+
+# Show NET vs KenPom rank comparison
+print(f'\nNET vs KenPom rank divergence (top 10 by |diff|):')
+_diff = (df['NET_Rank'] - df['Rk']).abs()
+for idx in _diff.nlargest(10).index:
+    row = df.loc[idx]
+    print(f'  {row["StdName"]}: NET #{int(row["NET_Rank"])} vs KP #{int(row["Rk"])} (diff: {int(row["NET_Rank"] - row["Rk"])})')
+
+print(f'\nData ready: {len(df)} teams')
+print(f'  NET rankings: {"real" if has_net else "KenPom proxy"}')
+print(f'  Quad records: {"yes" if has_quad else "no"}')
+print(f'  Team sheet metrics (SOR/WAB/KPI/BPI): {"yes" if has_teamsheet else "no"}')"""))
 
 # ==============================================================
 # CELL: Section 5 Header
@@ -345,16 +276,19 @@ print(f'\nData ready: {len(df)} teams, metrics: {"full" if (has_net and has_quad
 cells.append(md("s5-hdr", r"""## 5. Composite Scoring Model
 
 Normalize each metric to 0-100 (min-max across tournament field), then compute a weighted composite score.
+Now uses **real NET rankings** (not KenPom proxy) and adds committee-used metrics (SOR, WAB) from team sheets.
 
-| Metric | Weight (full) | Weight (fallback) |
-|--------|:---:|:---:|
-| KenPom NetRtg | 0.25 | 0.35 |
-| KenPom ORtg | 0.15 | 0.20 |
-| KenPom DRtg (inverted) | 0.10 | 0.10 |
-| SOS NetRtg | 0.10 | 0.10 |
-| NET Rank (inverted) | 0.15 | 0.25 |
-| Q1 Win % | 0.15 | -- |
-| Q1+Q2 Win % | 0.10 | -- |
+| Metric | Weight (full) | Weight (fallback) | Source |
+|--------|:---:|:---:|--------|
+| KenPom NetRtg | 0.20 | 0.30 | kenpom.csv |
+| KenPom ORtg | 0.10 | 0.15 | kenpom.csv |
+| KenPom DRtg (inverted) | 0.10 | 0.10 | kenpom.csv |
+| NET Rank (inverted) | 0.15 | 0.20 | ncaa-net-rankings.csv |
+| SOR (inverted) | 0.10 | -- | tournament_teams.csv |
+| WAB | 0.10 | -- | tournament_teams.csv |
+| NET SOS (inverted) | 0.05 | 0.10 | tournament_teams.csv |
+| Q1 Win % | 0.10 | 0.15 | ncaa-net-rankings.csv |
+| Q1+Q2 Win % | 0.10 | -- | ncaa-net-rankings.csv |
 
 **Tiebreaker:** When composite scores are within 1 point, rank by ORtg."""))
 
@@ -370,27 +304,53 @@ cells.append(code("composite", r"""def normalize_0_100(series, invert=False):
         return pd.Series(50.0, index=series.index)
     return ((s - s.min()) / rng * 100)
 
+# Core KenPom metrics
 df['n_NetRtg'] = normalize_0_100(df['NetRtg'])
 df['n_ORtg'] = normalize_0_100(df['ORtg'])
 df['n_DRtg'] = normalize_0_100(df['DRtg'], invert=True)
-df['n_SOS'] = normalize_0_100(df['SOS_NetRtg'])
+
+# Real NET rank (now independent from KenPom!)
 df['n_NET'] = normalize_0_100(df['NET_Rank'], invert=True)
 
-if has_quad and df['Q1_WinPct'].notna().any() and df['Q1_WinPct'].sum() > 0:
+# Team sheet metrics (SOR, WAB, NET SOS)
+has_sor = has_teamsheet and df['SOR'].notna().any()
+if has_sor:
+    df['n_SOR'] = normalize_0_100(df['SOR'].fillna(df['SOR'].max()), invert=True)
+    df['n_WAB'] = normalize_0_100(df['WAB'].fillna(df['WAB'].min()))
+    df['n_NET_SOS'] = normalize_0_100(df['NET_SOS'].fillna(df['NET_SOS'].max()), invert=True)
+
+# Shared normalizations (computed once, used by multiple branches)
+has_q1 = has_quad
+if has_q1:
     df['n_Q1'] = normalize_0_100(df['Q1_WinPct'].fillna(0))
     df['n_Q1Q2'] = normalize_0_100(df['Q1Q2_WinPct'].fillna(0))
+if not has_sor:
+    df['n_SOS'] = normalize_0_100(df['SOS_NetRtg'])
+
+if has_sor and has_q1:
+    # Full scheme: 9 truly independent features
     df['Composite'] = (
-        0.25 * df['n_NetRtg'] + 0.15 * df['n_ORtg'] + 0.10 * df['n_DRtg'] +
+        0.20 * df['n_NetRtg'] + 0.10 * df['n_ORtg'] + 0.10 * df['n_DRtg'] +
+        0.15 * df['n_NET'] +
+        0.10 * df['n_SOR'] + 0.10 * df['n_WAB'] + 0.05 * df['n_NET_SOS'] +
+        0.10 * df['n_Q1'] + 0.10 * df['n_Q1Q2']
+    )
+    weight_scheme = 'Full (NET + SOR/WAB + quad records)'
+elif has_q1:
+    # Mid scheme: no team sheet but have quad records
+    df['Composite'] = (
+        0.25 * df['n_NetRtg'] + 0.10 * df['n_ORtg'] + 0.10 * df['n_DRtg'] +
         0.10 * df['n_SOS'] + 0.15 * df['n_NET'] +
-        0.15 * df['n_Q1'] + 0.10 * df['n_Q1Q2']
+        0.15 * df['n_Q1'] + 0.15 * df['n_Q1Q2']
     )
-    weight_scheme = 'Full (with quad records)'
+    weight_scheme = 'Mid (NET + quad records, no SOR/WAB)'
 else:
+    # Fallback: minimal data
     df['Composite'] = (
-        0.35 * df['n_NetRtg'] + 0.20 * df['n_ORtg'] + 0.10 * df['n_DRtg'] +
-        0.10 * df['n_SOS'] + 0.25 * df['n_NET']
+        0.30 * df['n_NetRtg'] + 0.15 * df['n_ORtg'] + 0.10 * df['n_DRtg'] +
+        0.10 * df['n_SOS'] + 0.35 * df['n_NET']
     )
-    weight_scheme = 'Fallback (no quad records)'
+    weight_scheme = 'Fallback (no quad records or team sheets)'
 
 # Sort with ORtg tiebreaker
 df = df.sort_values(['Composite', 'ORtg'], ascending=[False, False]).reset_index(drop=True)
@@ -400,7 +360,10 @@ df['DRtg_Rank'] = df['DRtg'].rank(ascending=True).astype(int)
 
 print(f'Composite scoring: {weight_scheme}\n')
 print('Top 20 by Composite Score:')
-df[['CompRank', 'StdName', 'Region', 'Seed', 'Composite', 'NetRtg', 'ORtg', 'DRtg', 'NET_Rank']].head(20)"""))
+show_cols = ['CompRank', 'StdName', 'Region', 'Seed', 'Composite', 'NetRtg', 'NET_Rank']
+if has_sor:
+    show_cols += ['SOR', 'WAB']
+df[show_cols].head(20)"""))
 
 # ==============================================================
 # CELL: Section 6 Header
@@ -464,7 +427,7 @@ def simulate_region(region, df, bracket, n_sims=N_SIMS, seed=42):
 
 print(f'Running {N_SIMS:,} Monte Carlo simulations per region...\n')
 sim_results = {}
-for region in ['East', 'South', 'West', 'Midwest']:
+for region in REGION_COLORS:
     sim_results[region] = simulate_region(region, df, bracket)
     top = list(sim_results[region].items())[:5]
     print(f'{region} Region:')
@@ -490,7 +453,7 @@ that maximizes probability-weighted composite score while satisfying seed sum >=
 # ==============================================================
 cells.append(code("optimize", r"""# Top 5 candidates per region by FF probability
 candidates = {}
-for region in ['East', 'South', 'West', 'Midwest']:
+for region in REGION_COLORS:
     region_df = df[df['Region'] == region].nlargest(5, 'FF_Prob')
     candidates[region] = region_df[['StdName', 'Seed', 'Composite', 'FF_Prob']].to_dict('records')
 
@@ -538,11 +501,17 @@ print(f'Seed Sum: {optimal["Seed_Sum"]}')
 
 # Flag suspicious picks
 print('\nPick Analysis:')
-sos_q25 = df['SOS_NetRtg'].quantile(0.25)
+# Normalize SOS to percentile (higher = harder schedule) regardless of source
+if has_sor:
+    _sos_pctile = df['NET_SOS'].rank(ascending=True, pct=True)  # rank is inverted: low NET_SOS = hard
+else:
+    _sos_pctile = df['SOS_NetRtg'].rank(ascending=False, pct=True)  # rating: high = hard
 for team in FINAL_FOUR:
-    row = df[df['StdName'] == team].iloc[0]
+    _match = df[df['StdName'] == team]
+    row = _match.iloc[0]
+    tidx = _match.index[0]
     flags = []
-    if row['SOS_NetRtg'] < sos_q25:
+    if _sos_pctile.loc[tidx] < 0.25:
         flags.append('LOW SOS')
     if row['Conf'] not in ['ACC', 'B10', 'B12', 'SEC', 'BE']:
         flags.append('NON-POWER')
@@ -618,13 +587,16 @@ plt.show()"""))
 # ==============================================================
 cells.append(code("viz-tables", r"""from IPython.display import display, HTML
 
-for region in ['East', 'South', 'West', 'Midwest']:
+for region in REGION_COLORS:
     region_df = df[df['Region'] == region].nlargest(6, 'Composite')
 
     cols = ['Seed', 'StdName', 'Composite', 'Rk', 'NetRtg', 'ORtg', 'DRtg', 'NET_Rank', 'FF_Prob']
+    if has_sor:
+        cols.insert(8, 'SOR')
+        cols.insert(9, 'WAB')
     if has_quad and 'Q1_W' in df.columns:
-        cols.insert(7, 'Q1_W')
-        cols.insert(8, 'Q1_L')
+        cols.insert(-1, 'Q1_W')
+        cols.insert(-1, 'Q1_L')
 
     tbl = region_df[cols].copy()
     rename_map = {'StdName': 'Team', 'Rk': 'KP#', 'NET_Rank': 'NET#', 'FF_Prob': 'FF%'}
@@ -659,8 +631,12 @@ for region in ['East', 'South', 'West', 'Midwest']:
 # ==============================================================
 cells.append(code("viz-radar", r"""fig, axes = plt.subplots(2, 2, figsize=(14, 14), subplot_kw=dict(polar=True))
 
-radar_metrics = ['n_NetRtg', 'n_ORtg', 'n_DRtg', 'n_SOS', 'n_NET']
-radar_labels = ['Net Rating', 'Off Rating', 'Def Rating', 'SOS', 'NET Rank']
+radar_metrics = ['n_NetRtg', 'n_ORtg', 'n_DRtg', 'n_NET']
+radar_labels = ['Net Rating', 'Off Rating', 'Def Rating', 'NET Rank']
+
+if has_sor and 'n_SOR' in df.columns:
+    radar_metrics += ['n_SOR', 'n_WAB']
+    radar_labels += ['SOR', 'WAB']
 
 if has_quad and 'n_Q1' in df.columns:
     radar_metrics.append('n_Q1')
@@ -670,7 +646,7 @@ n_met = len(radar_metrics)
 angles = np.linspace(0, 2 * np.pi, n_met, endpoint=False).tolist()
 angles += angles[:1]
 
-for ax, region in zip(axes.flat, ['East', 'South', 'West', 'Midwest']):
+for ax, region in zip(axes.flat, REGION_COLORS):
     region_top = df[df['Region'] == region].nlargest(3, 'Composite')
 
     for _, row in region_top.iterrows():
@@ -766,6 +742,8 @@ for team_name in FINAL_FOUR:
     print(f'  KenPom Rank: #{int(row["Rk"])}  |  NET Rank: #{int(row["NET_Rank"])}')
     print(f'  ORtg: {row["ORtg"]:.1f} (#{row["ORtg_Rank"]} in field)  |  DRtg: {row["DRtg"]:.1f} (#{row["DRtg_Rank"]} in field)')
     print(f'  NetRtg: {row["NetRtg"]:.2f}  |  SOS: {row["SOS_NetRtg"]:.2f}')
+    if has_sor and pd.notna(row.get('SOR')):
+        print(f'  SOR: #{int(row["SOR"])}  |  WAB: {row["WAB"]:.0f}  |  KPI: #{int(row["KPI"])}  |  BPI: #{int(row["BPI"])}')
     if has_quad and 'Q1_W' in df.columns and pd.notna(row.get('Q1_W')):
         print(f'  Q1 Record: {int(row["Q1_W"])}-{int(row["Q1_L"])} ({row["Q1_WinPct"]:.1%})')
     print(f'  Final Four Probability: {row["FF_Prob"]:.1%}')
@@ -792,10 +770,13 @@ for team_name in FINAL_FOUR:
     row = df[df['StdName'] == team_name].iloc[0]
     seed = int(row['Seed'])
     region = row['Region']
+    sor_str = f', SOR #{int(row["SOR"])}' if has_sor and pd.notna(row.get('SOR')) else ''
+    wab_str = f', WAB {row["WAB"]:.0f}' if has_sor and pd.notna(row.get('WAB')) else ''
     para = (f'{team_name} ({seed}-seed, {region}): Ranked #{int(row["Rk"])} in KenPom '
+            f'and #{int(row["NET_Rank"])} in NET '
             f'with an offensive rating of {row["ORtg"]:.1f} (#{row["ORtg_Rank"]} in the tournament field), '
             f'{team_name} {"is a dominant force" if seed <= 2 else "is a data-backed upset pick"}. '
-            f'Their net efficiency of {row["NetRtg"]:.1f} and strength of schedule ({row["SOS_NetRtg"]:.1f}) '
+            f'Their net efficiency of {row["NetRtg"]:.1f}{sor_str}{wab_str} '
             f'confirm they have been tested against elite competition. '
             f'My simulation gives them a {row["FF_Prob"]:.0%} chance of reaching the Final Four.')
     if team_name == 'Duke':
@@ -816,8 +797,9 @@ dark_horses = [t for t in FINAL_FOUR if FINAL_FOUR_SEEDS[t] >= 5]
 
 parts = []
 parts.append('My Final Four selections are driven by a composite analytical model that '
-             'weighs KenPom efficiency ratings, NET rankings, strength of schedule, '
-             'and offensive performance -- the metric historically most predictive of tournament success.')
+             'weighs KenPom efficiency ratings, real NCAA NET rankings, Strength of Record (SOR), '
+             'Wins Above Bubble (WAB), and quad record performance -- blending predictive efficiency '
+             'metrics with the resume-based measures the selection committee actually uses.')
 
 if chalk:
     chalk_str = ' and '.join(chalk)
