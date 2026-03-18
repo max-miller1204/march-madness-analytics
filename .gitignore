@@ -1,4 +1,7 @@
-/.claude
-/past-plans
-/todo
+.claude/
+.claude.json
+past-plans/
+todo/
 assignment.md
+__pycache__/
+.ipynb_checkpoints/
