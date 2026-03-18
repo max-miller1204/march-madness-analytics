@@ -1,0 +1,33 @@
+Region,Round,GameID,SeedA,TeamA,SeedB,TeamB
+East,R64,E1,1,Duke,16,Siena
+East,R64,E2,8,Ohio State,9,TCU
+East,R64,E3,5,St. John's,12,Northern Iowa
+East,R64,E4,4,Kansas,13,Cal Baptist
+East,R64,E5,6,Louisville,11,South Florida
+East,R64,E6,3,Michigan State,14,North Dakota State
+East,R64,E7,7,UCLA,10,UCF
+East,R64,E8,2,UConn,15,Furman
+South,R64,S1,1,Florida,16,Lehigh/Prairie View A&M
+South,R64,S2,8,Clemson,9,Iowa
+South,R64,S3,5,Vanderbilt,12,McNeese
+South,R64,S4,4,Nebraska,13,Troy
+South,R64,S5,6,North Carolina,11,VCU
+South,R64,S6,3,Illinois,14,Penn
+South,R64,S7,7,Saint Mary's,10,Texas A&M
+South,R64,S8,2,Houston,15,Idaho
+West,R64,W1,1,Arizona,16,Long Island University
+West,R64,W2,8,Villanova,9,Utah State
+West,R64,W3,5,Wisconsin,12,High Point
+West,R64,W4,4,Arkansas,13,Hawaii
+West,R64,W5,6,BYU,11,NC State/Texas
+West,R64,W6,3,Gonzaga,14,Kennesaw State
+West,R64,W7,7,Miami (FL),10,Missouri
+West,R64,W8,2,Purdue,15,Queens (NC)
+Midwest,R64,M1,1,Michigan,16,Howard/UMBC
+Midwest,R64,M2,8,Georgia,9,Saint Louis
+Midwest,R64,M3,5,Texas Tech,12,Akron
+Midwest,R64,M4,4,Alabama,13,Hofstra
+Midwest,R64,M5,6,Tennessee,11,SMU/Miami (OH)
+Midwest,R64,M6,3,Virginia,14,Wright State
+Midwest,R64,M7,7,Kentucky,10,Santa Clara
+Midwest,R64,M8,2,Iowa State,15,Tennessee State
