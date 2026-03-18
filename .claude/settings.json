@@ -12,5 +12,6 @@
       }
     ]
   },
-  "plansDirectory": "./past-plans"
+  "plansDirectory": "./past-plans",
+  "enabledPlugins": {}
 }
