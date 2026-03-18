@@ -22,7 +22,6 @@ A composite analytical pipeline that predicts NCAA Tournament Final Four teams u
 
 ```bash
 pip install -r requirements.txt
-python _build_notebook.py
 jupyter notebook final_four_analysis.ipynb
 ```
 
@@ -61,34 +60,83 @@ P(A wins) = 1 / (1 + 10^(-(NetRtg_A - NetRtg_B) / 22))
 
 Each region is simulated 10,000 times (R64 -> R32 -> Sweet 16 -> Elite 8) to produce Final Four probabilities.
 
-## Notebook Output
+## Results
 
-- Composite score rankings for all 68 tournament teams
-- Regional tables with full metrics (KP#, NET#, SOR, WAB, Q1 record, FF%)
-- Efficiency scatter plot (ORtg vs DRtg)
-- Composite score bar chart (top 25)
-- Radar charts comparing top 3 contenders per region
-- Seed constraint configuration comparison
-- Dark horse identification (ORtg vs seed)
-- Final Four picks with detailed statistical breakdown
-- Two 200-word essay drafts (per-team paragraphs and cohesive narrative)
+### Optimal Final Four
+
+**Duke | Vanderbilt | Arkansas | Texas Tech** (Seed sum: 1+5+4+5 = 15)
+
+| Pick | Region | Seed | KP# | NET# | Composite | FF Prob | Type |
+|------|--------|------|-----|------|-----------|---------|------|
+| Duke | East | 1 | #1 | #1 | 87.5 | 54.6% | Chalk |
+| Vanderbilt | South | 5 | #12 | #13 | 72.4 | 8.2% | Dark Horse |
+| Arkansas | West | 4 | #15 | #15 | 70.4 | 7.4% | Moderate |
+| Texas Tech | Midwest | 5 | #20 | #19 | 67.6 | 4.9% | Dark Horse |
+
+### Top 20 by Composite Score
+
+| # | Team | Region | Seed | Composite | NetRtg | NET# | SOR | WAB |
+|---|------|--------|------|-----------|--------|------|-----|-----|
+| 1 | Duke | East | 1 | 87.5 | 38.90 | 1 | 3 | 2 |
+| 2 | Arizona | West | 1 | 86.5 | 37.62 | 3 | 1 | 3 |
+| 3 | Michigan | Midwest | 1 | 85.7 | 37.58 | 2 | 2 | 1 |
+| 4 | Florida | South | 1 | 79.1 | 33.78 | 4 | 5 | 6 |
+| 5 | Houston | South | 2 | 78.5 | 33.39 | 5 | 6 | 5 |
+| 6 | Gonzaga | West | 3 | 76.3 | 28.10 | 7 | 11 | 17 |
+| 7 | Iowa State | Midwest | 2 | 76.2 | 32.38 | 6 | 14 | 9 |
+| 8 | Purdue | West | 2 | 75.4 | 31.19 | 9 | 7 | 4 |
+| 9 | UConn | East | 2 | 75.2 | 27.85 | 10 | 4 | 7 |
+| 10 | Illinois | South | 3 | 74.2 | 32.09 | 8 | 17 | 18 |
+| 11 | Michigan State | East | 3 | 73.4 | 28.30 | 11 | 13 | 12 |
+| 12 | Virginia | Midwest | 3 | 73.1 | 26.71 | 12 | 9 | 8 |
+| 13 | Vanderbilt | South | 5 | 72.4 | 27.50 | 13 | 12 | 10 |
+| 14 | Nebraska | South | 4 | 71.9 | 26.15 | 14 | 10 | 13 |
+| 15 | St. John's | East | 5 | 70.5 | 25.89 | 16 | 16 | 14 |
+| 16 | Arkansas | West | 4 | 70.4 | 26.04 | 15 | 8 | 11 |
+| 17 | Alabama | Midwest | 4 | 69.7 | 25.70 | 18 | 15 | 15 |
+| 18 | Kansas | East | 4 | 68.4 | 24.41 | 21 | 18 | 16 |
+| 19 | Louisville | East | 6 | 67.8 | 25.42 | 17 | 26 | 24 |
+| 20 | Texas Tech | Midwest | 5 | 67.6 | 25.20 | 19 | 20 | 19 |
+
+### Monte Carlo Simulation (10,000 sims per region)
+
+| East | | South | | West | | Midwest | |
+|------|---|-------|---|------|---|---------|---|
+| (1) Duke | 54.6% | (1) Florida | 30.3% | (1) Arizona | 48.9% | (1) Michigan | 47.8% |
+| (2) UConn | 12.8% | (2) Houston | 26.0% | (2) Purdue | 21.7% | (2) Iowa State | 24.1% |
+| (3) Michigan St | 11.8% | (3) Illinois | 22.3% | (3) Gonzaga | 11.3% | (3) Virginia | 8.2% |
+| (5) St. John's | 5.9% | (5) Vanderbilt | 8.2% | (4) Arkansas | 7.4% | (4) Alabama | 5.9% |
+| (4) Kansas | 5.1% | (4) Nebraska | 7.2% | (5) Wisconsin | 3.8% | (5) Texas Tech | 4.9% |
+
+### Visualizations
+
+#### Offensive vs Defensive Efficiency
+![Efficiency Scatter](images/efficiency_scatter.png)
+
+#### Top 25 by Composite Score
+![Composite Bars](images/composite_bars.png)
+
+#### Regional Contender Comparison
+![Radar Charts](images/radar_charts.png)
+
+#### Seed Constraint Configs & Dark Horse Candidates
+![Seed ORtg](images/seed_ortg.png)
 
 ## Project Structure
 
 ```
-_build_notebook.py              # Generates the notebook programmatically
-final_four_analysis.ipynb       # Output notebook (run all cells)
-kenpom.csv                      # KenPom efficiency data (68 tournament teams)
-ncaa-net-rankings.csv           # NCAA NET rankings (365 D1 teams)
-bracket.csv                     # Tournament bracket (32 first-round games)
+final_four_analysis.ipynb       # Main notebook (run all cells)
 requirements.txt                # Python dependencies
-scrape_net_teamsheets.py        # Scrapes Warren Nolan team sheets
-filter_tournament_teams.py      # Filters scraped data to tournament teams
-assignment.md                   # Assignment specification
+scripts/
+  scrape_net_teamsheets.py        # Scrapes Warren Nolan team sheets
+  filter_tournament_teams.py      # Filters scraped data to tournament teams
 scraped_data/
   tournament_teams.csv          # Team-level metrics (68 teams)
   tournament_games.csv          # Game-by-game results (~2200 games)
   quad_records.csv              # Q1/Q2 win-loss records
+  ncaa-net-rankings.csv           # NCAA NET rankings (365 D1 teams)
+  kenpom.csv                      # KenPom efficiency data (68 tournament teams)
+  bracket.csv                     # Tournament bracket (32 first-round games)
 ```
 
 ## Key Metrics Glossary
