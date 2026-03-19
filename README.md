@@ -1,6 +1,6 @@
 # March Madness 2026: Live Bracket Analysis & Prediction Engine
 
-A live tournament prediction pipeline that generates a full 63-game bracket, tracks accuracy in real-time, and refits models as results come in. Built on KenPom efficiency metrics, NCAA NET rankings, committee evaluation metrics (SOR, WAB, KPI, BPI), quantitative models (GARCH volatility, HMM regime detection, Kalman momentum filtering, historical seed priors), Monte Carlo simulation, and EV-optimized bracket construction.
+A live tournament prediction pipeline that generates a full 63-game bracket, tracks accuracy in real-time, and refits models as results come in. Built on KenPom efficiency metrics, NCAA NET rankings, committee evaluation metrics (SOR, WAB, KPI, BPI), quantitative models (GARCH volatility, HMM regime detection, Kalman momentum filtering, historical seed priors), Monte Carlo simulation, and EV-optimized bracket construction with contrarian leverage overlay.
 
 <!-- ACCURACY_START -->
 ## Tournament Accuracy Tracker
@@ -23,8 +23,7 @@ A live tournament prediction pipeline that generates a full 63-game bracket, tra
 2. **Injury Adjustment** -- Real-time injury data adjusts team NetRtg values using player impact penalties
 3. **Quantitative Enhancements** -- GARCH volatility replaces fixed win-probability divisor, HMM detects team regime states, Kalman filter tracks momentum, historical seed priors provide Bayesian blending
 4. **Monte Carlo Simulation** -- 10,000 full-bracket simulations (63 games each) with both baseline and enhanced models
-5. **Seed-Constrained Optimization** -- Brute-force search for the highest-scoring Final Four with seed sum >= 15
-6. **EV-Optimized Bracket** -- Unconstrained per-slot expected value optimization with contrarian leverage adjustment
+5. **EV-Optimized Bracket** -- Per-slot expected value optimization with contrarian leverage adjustment
 
 ## Data Sources
 
@@ -122,17 +121,6 @@ Each model runs 10,000 full-bracket simulations (63 games: R64 through Champions
 
 ## Results
 
-### Optimal Final Four (Seed-Constrained)
-
-**St. John's | Illinois | Arizona | Tennessee** (Seed sum: 5+3+1+6 = 15)
-
-| Pick | Region | Seed | KP# | NET# | Composite | FF Prob | Type |
-|------|--------|------|-----|------|-----------|---------|------|
-| Arizona | West | 1 | #2 | #3 | 86.6 | 49.7% | Chalk |
-| Illinois | South | 3 | #7 | #8 | 74.5 | 23.1% | Moderate |
-| St. John's | East | 5 | #17 | #16 | 71.3 | 6.4% | Dark Horse |
-| Tennessee | Midwest | 6 | #16 | #20 | 67.8 | 4.8% | Dark Horse |
-
 ### Top 20 by Composite Score
 
 | # | Team | Region | Seed | Composite | NetRtg | NET# | SOR | WAB |
@@ -191,7 +179,7 @@ The enhanced model (GARCH + HMM + Kalman + historical priors) redistributes prob
 | Nebraska | 6.9% | 9.6% | +2.7% |
 | Kansas | 5.5% | 9.3% | +3.8% |
 
-### EV-Optimized Bracket (Unconstrained)
+### EV-Optimized Bracket
 
 ESPN fantasy scoring: R64=10, R32=20, S16=40, E8=80, FF=160, Championship=320.
 
@@ -201,7 +189,7 @@ ESPN fantasy scoring: R64=10, R32=20, S16=40, E8=80, FF=160, Championship=320.
 | Total EV (leverage-adjusted) | 826.2 pts |
 | Predicted Champion | Duke |
 
-**Unconstrained EV-Optimal Final Four:**
+**Final Four:**
 
 | Pick | Region | Seed | Composite |
 |------|--------|------|-----------|
@@ -209,8 +197,6 @@ ESPN fantasy scoring: R64=10, R32=20, S16=40, E8=80, FF=160, Championship=320.
 | Duke | East | 1 | 85.2 |
 | Illinois | South | 3 | 74.5 |
 | Michigan | Midwest | 1 | 84.7 |
-
-Overlap with constrained picks: 2 teams (Arizona, Illinois). Unconstrained seed sum: 6.
 
 ### Leverage Sensitivity Analysis
 
@@ -233,9 +219,6 @@ Overlap with constrained picks: 2 teams (Arizona, Illinois). Unconstrained seed 
 #### Regional Contender Comparison
 ![Radar Charts](images/radar_charts.png)
 
-#### Seed Constraint Configs & Dark Horse Candidates
-![Seed ORtg](images/seed_ortg.png)
-
 #### Quantitative Model Analysis
 ![Quant Analysis](images/quant_analysis.png)
 
@@ -254,7 +237,7 @@ Overlap with constrained picks: 2 teams (Arizona, Illinois). Unconstrained seed 
 | Kalman Filter | `KalmanMomentum` | Tracks late-season momentum as a random walk on margin residuals (Q=2, R=10) |
 | Historical Prior | `HistoricalPrior` | Bayesian blending with 1985+ seed matchup win rates (e.g., 1v16: 99.4%, 8v9: 51.5%) |
 | Enhanced Simulator | `QuantEnhancedSimulator` | Full 63-game MC combining all models with graceful degradation |
-| EV Optimizer | `EVOptimizedSimulator` | Unconstrained per-slot EV maximization with contrarian leverage overlay |
+| EV Optimizer | `EVOptimizedSimulator` | Per-slot EV maximization with contrarian leverage overlay |
 | Public Ownership | `PublicOwnership` | Seed-based public pick % estimates for contrarian leverage scoring |
 
 All models are in `scripts/quant_models.py`. Each is optional -- the notebook and simulator degrade gracefully if any model fails or its dependencies (`arch`, `hmmlearn`, `filterpy`) are missing.
@@ -285,7 +268,6 @@ images/
   efficiency_scatter.png          # ORtg vs DRtg scatter plot
   composite_bars.png              # Top 25 composite score bar chart
   radar_charts.png                # Regional contender radar comparisons
-  seed_ortg.png                   # Seed constraint configs + dark horse candidates
   quant_analysis.png              # Baseline vs enhanced FF probs + GARCH volatility
   injury_dashboard.png            # Injury impact visualization
   ev_bracket_analysis.png         # EV by round + top 10 highest-EV picks
