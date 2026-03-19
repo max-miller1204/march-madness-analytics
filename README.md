@@ -1,13 +1,14 @@
 # March Madness 2026: Data-Driven Final Four Analysis
 
-A composite analytical pipeline that predicts NCAA Tournament Final Four teams using KenPom efficiency metrics, real NCAA NET rankings, committee evaluation metrics (SOR, WAB, KPI, BPI), Monte Carlo bracket simulation, and seed-constraint optimization.
+A composite analytical pipeline that predicts NCAA Tournament Final Four teams and produces a full 63-game bracket using KenPom efficiency metrics, real NCAA NET rankings, committee evaluation metrics (SOR, WAB, KPI, BPI), quantitative models (GARCH volatility, HMM regime detection, Kalman momentum filtering, historical seed priors), Monte Carlo bracket simulation, and seed-constraint optimization.
 
 ## How It Works
 
-1. **Composite Scoring** -- Each team gets a weighted score from up to 10 normalized (0-100) metrics
+1. **Composite Scoring** -- Each team gets a weighted score from up to 11 normalized (0-100) metrics
 2. **Injury Adjustment** -- Real-time injury data adjusts team NetRtg values using player impact penalties
-3. **Monte Carlo Simulation** -- 10,000 bracket simulations per region using injury-adjusted efficiency differentials
-4. **Seed-Constrained Optimization** -- Brute-force search for the highest-scoring Final Four with seed sum >= 15
+3. **Quantitative Enhancements** -- GARCH volatility replaces fixed win-probability divisor, HMM detects team regime states, Kalman filter tracks momentum, historical seed priors provide Bayesian blending
+4. **Monte Carlo Simulation** -- 10,000 full-bracket simulations (63 games each) with both baseline and enhanced models
+5. **Seed-Constrained Optimization** -- Brute-force search for the highest-scoring Final Four with seed sum >= 15
 
 ## Data Sources
 
@@ -21,6 +22,7 @@ A composite analytical pipeline that predicts NCAA Tournament Final Four teams u
 | Injury reports | `scraped_data/injuries.csv` | [boydsbets.com](https://www.boydsbets.com/college-basketball-injuries/) |
 | Player stats (MPG, PPG) | `scraped_data/player_stats.csv` | [espn.com](https://www.espn.com/mens-college-basketball/) |
 | Injury adjustments | `scraped_data/injury_adjustments.csv` | Computed from injuries + player stats + KenPom |
+| Historical seed win rates | `scraped_data/historical_seed_rates.csv` | [Wikipedia](https://en.wikipedia.org/wiki/NCAA_tournament) (1985+) |
 
 ## Quickstart
 
@@ -54,36 +56,53 @@ jupyter nbconvert --execute final_four_analysis.ipynb --to notebook
 
 Both scrapers cache results for 6 hours. Use `--refresh` to force re-scrape.
 
-**Without injury data:** The notebook gracefully degrades -- it runs the original 9-feature model with unadjusted NetRtg values. No scrapers required.
+**Historical seed data:**
+
+```bash
+python scripts/scrape_historical_brackets.py
+```
+
+Falls back to hardcoded rates if Wikipedia is unavailable.
+
+**Without injury/quant data:** The notebook gracefully degrades -- it runs the original 9-feature model with unadjusted NetRtg values. No scrapers or quant dependencies required.
 
 ## Composite Model Weights
 
-With injury data, the full scheme uses 10 features. Without injuries, it falls back to 9 features with redistributed weights.
+With all enhancements, the full scheme uses 11 features. The model degrades gracefully when components are unavailable.
 
-| Metric | W/ Injuries | W/o Injuries | Source |
-|--------|:-----------:|:------------:|--------|
-| KenPom Net Rating | 0.175 | 0.20 | kenpom.csv |
+| Metric | Enhanced | Baseline | Source |
+|--------|:--------:|:--------:|--------|
+| KenPom Net Rating | 0.15 | 0.175 | kenpom.csv |
 | KenPom Offensive Rating | 0.10 | 0.10 | kenpom.csv |
 | KenPom Defensive Rating (inv) | 0.10 | 0.10 | kenpom.csv |
-| NCAA NET Rank (inv) | 0.125 | 0.15 | ncaa-net-rankings.csv |
+| NCAA NET Rank (inv) | 0.10 | 0.125 | ncaa-net-rankings.csv |
 | Strength of Record (inv) | 0.10 | 0.10 | tournament_teams.csv |
 | Wins Above Bubble | 0.10 | 0.10 | tournament_teams.csv |
 | NET Strength of Schedule (inv) | 0.05 | 0.05 | tournament_teams.csv |
 | Q1 Win % | 0.10 | 0.10 | ncaa-net-rankings.csv |
 | Q1+Q2 Win % | 0.10 | 0.10 | ncaa-net-rankings.csv |
-| **Injury Health** | **0.05** | -- | injury_adjustments.csv |
+| Injury Health | 0.05 | 0.05 | injury_adjustments.csv |
+| **Kalman Momentum** | **0.05** | -- | quant_models.py |
 
 Additional fallback weight schemes activate when team sheet or quad data is unavailable.
 
 ## Monte Carlo Simulation
 
-Win probability uses a logistic function on **injury-adjusted** net efficiency differentials:
+**Baseline model** uses a logistic function on injury-adjusted net efficiency differentials with a fixed divisor:
 
 ```
 P(A wins) = 1 / (1 + 10^(-(NetRtg_A - NetRtg_B) / 22))
 ```
 
-Each region is simulated 10,000 times (R64 -> R32 -> Sweet 16 -> Elite 8) to produce Final Four probabilities.
+**Enhanced model** replaces the fixed divisor with per-matchup GARCH volatility, applies HMM regime adjustments, and blends with historical seed priors:
+
+```
+combined_vol = sqrt(GARCH_vol_A^2 + GARCH_vol_B^2)    # replaces fixed 22
+P_model = 1 / (1 + 10^(-margin / combined_vol))        # volatility-adjusted
+P_final = bayesian_blend(P_model, historical_prior)     # seed-aware blending
+```
+
+Each model runs 10,000 full-bracket simulations (63 games: R64 through Championship). The notebook outputs a side-by-side comparison.
 
 ## Results
 
@@ -147,12 +166,29 @@ Each region is simulated 10,000 times (R64 -> R32 -> Sweet 16 -> Elite 8) to pro
 #### Seed Constraint Configs & Dark Horse Candidates
 ![Seed ORtg](images/seed_ortg.png)
 
+#### Quantitative Model Analysis
+![Quant Analysis](images/quant_analysis.png)
+
+## Quantitative Models
+
+| Model | Class | Purpose |
+|-------|-------|---------|
+| Hierarchical GARCH(1,1) | `HierarchicalGARCH` | Per-team performance volatility from game-by-game margins; replaces fixed win-probability divisor |
+| Gaussian HMM | `TeamHMM` | Detects hot/cold team regimes from quad-adjusted margins; BIC selects 2-4 states |
+| Kalman Filter | `KalmanMomentum` | Tracks late-season momentum as a random walk on margin residuals (Q=2, R=10) |
+| Historical Prior | `HistoricalPrior` | Bayesian blending with 1985+ seed matchup win rates (e.g., 1v16: 99.4%, 8v9: 51.5%) |
+| Enhanced Simulator | `QuantEnhancedSimulator` | Full 63-game MC combining all models with graceful degradation |
+
+All models are in `scripts/quant_models.py`. Each is optional -- the notebook and simulator degrade gracefully if any model fails or its dependencies (`arch`, `hmmlearn`, `filterpy`) are missing.
+
 ## Project Structure
 
 ```
 final_four_analysis.ipynb         # Main notebook (run all cells)
 requirements.txt                  # Python dependencies
 scripts/
+  quant_models.py                 # GARCH, HMM, Kalman, Prior, Enhanced Simulator
+  scrape_historical_brackets.py   # Scrapes Wikipedia for historical seed win rates
   scrape_net_teamsheets.py        # Scrapes Warren Nolan team sheets
   filter_tournament_teams.py      # Filters scraped data to tournament teams
   scrape_injuries.py              # Scrapes injury reports from boydsbets.com
@@ -163,6 +199,7 @@ scraped_data/
   ncaa-net-rankings.csv           # NCAA NET rankings (365 D1 teams)
   kenpom.csv                      # KenPom efficiency data (68 tournament teams)
   bracket.csv                     # Tournament bracket (32 first-round games)
+  historical_seed_rates.csv       # Historical seed matchup win rates (1985+)
   injuries.csv                    # Injury reports (tournament teams only)
   player_stats.csv                # Per-player MPG/PPG for tournament teams
   injury_adjustments.csv          # Injury penalties + adjusted NetRtg per team
@@ -180,3 +217,6 @@ scraped_data/
 | KPI | [Warren Nolan](https://www.warrennolan.com/basketball/2026/net-teamsheets-plus) | Kevin Pauga Index -- predictive metric used by the committee |
 | BPI | [ESPN](https://www.espn.com/mens-college-basketball/bpi) | Basketball Power Index |
 | Q1 / Q2 | [NCAA NET](https://www.ncaa.com/rankings/basketball-men/d1/ncaa-mens-basketball-net-rankings) | Quadrant records (Q1: vs top 75, Q2: vs 76-150) |
+| GARCH Vol | quant_models.py | Per-team performance volatility from GARCH(1,1) on game margins |
+| HMM State | quant_models.py | Current regime (hot/cold) from Gaussian Hidden Markov Model |
+| Kalman Momentum | quant_models.py | Late-season trend from Kalman-filtered margin residuals (0-100) |
