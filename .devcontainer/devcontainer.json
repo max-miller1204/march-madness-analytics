@@ -22,5 +22,8 @@
         "tomoki1207.pdf"
       ]
     }
-  }
+  },
+  "features": {
+    "ghcr.io/GeorgOfenbeck/features/lazygit-linuxbinary:1": {}
+}
 }
