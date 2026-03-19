@@ -111,6 +111,8 @@ ESPN_ALIASES = {
     "Hawai'i": "Hawaii",
     "Hawai\u02bbi": "Hawaii",
     "Hawaii Rainbow Warriors": "Hawaii",
+    "Pennsylvania": "Penn",
+    "Pennsylvania Quakers": "Penn",
     "Prairie View AM": "Prairie View A&M",
     "Texas AM": "Texas A&M",
     "LIU": "Long Island University",
