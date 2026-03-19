@@ -1,6 +1,6 @@
-# March Madness 2026: Data-Driven Final Four Analysis
+# March Madness 2026: Live Bracket Analysis & Prediction Engine
 
-A composite analytical pipeline that predicts NCAA Tournament Final Four teams and produces a full 63-game bracket using KenPom efficiency metrics, real NCAA NET rankings, committee evaluation metrics (SOR, WAB, KPI, BPI), quantitative models (GARCH volatility, HMM regime detection, Kalman momentum filtering, historical seed priors), Monte Carlo bracket simulation, and seed-constraint optimization.
+A live tournament prediction pipeline that generates a full 63-game bracket, tracks accuracy in real-time, and refits models as results come in. Built on KenPom efficiency metrics, NCAA NET rankings, committee evaluation metrics (SOR, WAB, KPI, BPI), quantitative models (GARCH volatility, HMM regime detection, Kalman momentum filtering, historical seed priors), Monte Carlo simulation, and EV-optimized bracket construction.
 
 <!-- ACCURACY_START -->
 ## Tournament Accuracy Tracker
