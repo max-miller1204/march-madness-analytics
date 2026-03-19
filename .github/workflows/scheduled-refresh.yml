@@ -27,7 +27,7 @@ jobs:
         run: pip install -r requirements.txt pytest
 
       - name: Run refresh pipeline
-        run: python scripts/refresh.py all --no-notebook
+        run: python scripts/refresh.py --no-notebook all
 
       - name: Commit updated data
         run: |
