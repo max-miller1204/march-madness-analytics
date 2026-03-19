@@ -57,17 +57,23 @@ jobs:
             const latest = runs[runs.length - 1];
             const summary = latest.summary || {};
 
+            const totalGames = latest.games_completed ?? 'N/A';
+            const accuracy = summary.accuracy;
+            const correctPicks = (accuracy != null && latest.games_completed != null)
+              ? Math.round(accuracy * latest.games_completed) : 'N/A';
+            const upsetsCaught = summary.upsets_predicted_correctly ?? 'N/A';
+
             const body = [
               `## Accuracy Report — ${latest.timestamp || new Date().toISOString()}`,
               '',
               `| Metric | Value |`,
               `|--------|-------|`,
-              `| Games tracked | ${summary.total_games ?? 'N/A'} |`,
-              `| Correct picks | ${summary.correct ?? 'N/A'} |`,
-              `| Accuracy | ${summary.accuracy != null ? (summary.accuracy * 100).toFixed(1) + '%' : 'N/A'} |`,
-              `| Upsets caught | ${summary.upsets_caught ?? 'N/A'} |`,
+              `| Games tracked | ${totalGames} |`,
+              `| Correct picks | ${correctPicks} |`,
+              `| Accuracy | ${accuracy != null ? (accuracy * 100).toFixed(1) + '%' : 'N/A'} |`,
+              `| Upsets caught | ${upsetsCaught} |`,
               '',
-              '![Accuracy Dashboard](images/accuracy_dashboard.png)',
+              `![Accuracy Dashboard](https://raw.githubusercontent.com/${context.repo.owner}/${context.repo.repo}/main/images/accuracy_dashboard.png)`,
             ].join('\n');
 
             // Find or create a pinned tracking issue
