@@ -39,7 +39,9 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add --ignore-missing images/accuracy_dashboard.png scraped_data/accuracy_log.json README.md
+          for f in images/accuracy_dashboard.png scraped_data/accuracy_log.json README.md; do
+            [ -f "$f" ] && git add "$f"
+          done
           git diff --cached --quiet || git commit -m "chore: update accuracy dashboard and README"
           git push
 
