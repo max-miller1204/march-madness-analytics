@@ -586,9 +586,9 @@
       }
     },
     {
-      "timestamp": "2026-03-19T22:54:05Z",
+      "timestamp": "2026-03-19T23:06:24Z",
       "round": "Round of 64",
-      "games_completed": 7,
+      "games_completed": 8,
       "predictions": [
         {
           "game_id": "E1",
@@ -651,6 +651,16 @@
           "upset": false
         },
         {
+          "game_id": "S5",
+          "predicted_winner": "North Carolina",
+          "predicted_prob": 0.5965,
+          "actual_winner": "North Carolina",
+          "correct": true,
+          "ev_predicted": 5.96,
+          "ev_actual": 10,
+          "upset": false
+        },
+        {
           "game_id": "W3",
           "predicted_winner": "Wisconsin",
           "predicted_prob": 0.8286,
@@ -662,18 +672,18 @@
         }
       ],
       "summary": {
-        "accuracy": 0.7143,
-        "brier_score": 0.1687,
+        "accuracy": 0.75,
+        "brier_score": 0.168,
         "upsets_predicted_correctly": 0,
         "upsets_missed": 2,
-        "total_ev_predicted": 58.37,
-        "total_ev_actual": 50.0
+        "total_ev_predicted": 64.33,
+        "total_ev_actual": 60.0
       }
     },
     {
-      "timestamp": "2026-03-19T22:54:54Z",
+      "timestamp": "2026-03-19T23:11:52Z",
       "round": "Round of 64",
-      "games_completed": 7,
+      "games_completed": 8,
       "predictions": [
         {
           "game_id": "E1",
@@ -736,6 +746,16 @@
           "upset": false
         },
         {
+          "game_id": "S5",
+          "predicted_winner": "North Carolina",
+          "predicted_prob": 0.5965,
+          "actual_winner": "North Carolina",
+          "correct": true,
+          "ev_predicted": 5.96,
+          "ev_actual": 10,
+          "upset": false
+        },
+        {
           "game_id": "W3",
           "predicted_winner": "Wisconsin",
           "predicted_prob": 0.8286,
@@ -747,12 +767,12 @@
         }
       ],
       "summary": {
-        "accuracy": 0.7143,
-        "brier_score": 0.1687,
+        "accuracy": 0.75,
+        "brier_score": 0.168,
         "upsets_predicted_correctly": 0,
         "upsets_missed": 2,
-        "total_ev_predicted": 58.37,
-        "total_ev_actual": 50.0
+        "total_ev_predicted": 64.33,
+        "total_ev_actual": 60.0
       }
     }
   ]

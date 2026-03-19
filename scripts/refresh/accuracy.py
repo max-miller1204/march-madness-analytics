@@ -497,21 +497,6 @@ def track_accuracy(state_path=None, log_path=None):
             with open(state_path, "r") as f:
                 state = json.load(f)
 
-            # Support both flat "predictions" list and nested "predictions_at_time" dict
-            predictions = state.get("predictions", [])
-            if not predictions:
-                pat = state.get("predictions_at_time", {})
-                for round_name_key, games in pat.items():
-                    for game_id, pred in games.items():
-                        predictions.append(
-                            {
-                                "game_id": game_id,
-                                "predicted_winner": pred["predicted_winner"],
-                                "predicted_prob": pred.get("win_prob", 0.5),
-                                "round": round_name_key,
-                            }
-                        )
-
             completed = state.get("completed_games", [])
             # Ensure higher_seed_won is set for upset detection
             for g in completed:
@@ -523,6 +508,35 @@ def track_accuracy(state_path=None, log_path=None):
                         g["higher_seed_won"] = g["winner"] == higher_seed
                     else:
                         g["higher_seed_won"] = True  # default
+
+            # Support both flat "predictions" list and nested "predictions_at_time" dict
+            predictions = state.get("predictions", [])
+            if not predictions:
+                pat = state.get("predictions_at_time", {})
+                # Build team→game_id index from completed games for resolving
+                # long-format prediction IDs (e.g. "M_Round of 64_Michigan")
+                _team_to_gid = {}
+                for g in completed:
+                    _team_to_gid[(g.get("round", ""), g.get("team_a", ""))] = g["game_id"]
+                    _team_to_gid[(g.get("round", ""), g.get("team_b", ""))] = g["game_id"]
+
+                for round_name_key, games in pat.items():
+                    for pred_id, pred in games.items():
+                        # Resolve long-format IDs to completed game IDs
+                        game_id = pred_id
+                        if pred_id not in {g["game_id"] for g in completed}:
+                            team = pred["predicted_winner"]
+                            resolved = _team_to_gid.get((round_name_key, team))
+                            if resolved:
+                                game_id = resolved
+                        predictions.append(
+                            {
+                                "game_id": game_id,
+                                "predicted_winner": pred["predicted_winner"],
+                                "predicted_prob": pred.get("win_prob", 0.5),
+                                "round": round_name_key,
+                            }
+                        )
 
             if predictions and completed:
                 summary = tracker.log_run(predictions, completed)
