@@ -108,6 +108,9 @@ ESPN_ALIASES = {
     "Saint John's": "St. John's",
     "Pitt": "Pittsburgh",
     "Prairie View": "Prairie View A&M",
+    "Hawai'i": "Hawaii",
+    "Hawai\u02bbi": "Hawaii",
+    "Hawaii Rainbow Warriors": "Hawaii",
     "Prairie View AM": "Prairie View A&M",
     "Texas AM": "Texas A&M",
     "LIU": "Long Island University",
@@ -358,7 +361,8 @@ def _parse_from_json(events, bracket_teams, bracket_games, seen_ids):
             for c in competitors:
                 team_obj = c.get("team", {})
                 name = (
-                    team_obj.get("shortDisplayName")
+                    team_obj.get("location")
+                    or team_obj.get("shortDisplayName")
                     or team_obj.get("displayName")
                     or team_obj.get("name", "")
                 )
