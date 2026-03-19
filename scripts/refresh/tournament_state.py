@@ -1,23 +1,26 @@
 """Tournament state management — tracks completed games, predictions, and bracket progression."""
 
 import json
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+# Ensure the scripts directory is importable
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
+from scripts.quant_models import REGION_PREFIXES
 
-# Round detection thresholds
+
+# Round detection: maps game count ranges to the round currently in progress.
+# The threshold is the minimum number of completed games for that round.
 ROUND_THRESHOLDS = [
     (0, "Pre-tournament"),
-    (32, "Round of 64"),
-    (48, "Round of 32"),
-    (56, "Sweet 16"),
-    (60, "Elite 8"),
-    (62, "Final Four"),
+    (1, "Round of 64"),
+    (33, "Round of 32"),
+    (49, "Sweet 16"),
+    (57, "Elite 8"),
+    (61, "Final Four"),
     (63, "Championship"),
 ]
-
-# Game ID derivation: R64 games are E1-E8, S1-S8, W1-W8, M1-M8
-REGION_PREFIXES = {"East": "E", "South": "S", "West": "W", "Midwest": "M"}
 
 # R32 game IDs: winner of game i vs winner of game i+1 → game prefix + (8 + ceil(i/2))
 # S16: prefix + 13/14, E8: prefix + 15, FF: F1/F2, Championship: C1
@@ -57,19 +60,19 @@ class TournamentState:
             json.dump(self.state, f, indent=2)
 
     def detect_round(self):
-        """Determine current round based on number of completed games."""
+        """Determine current round based on number of completed games.
+
+        Returns the round currently in progress. E.g., 32 completed games
+        means all R64 games are done, so the current round is "Round of 32".
+        """
         n = len(self.state["completed_games"])
         current = "Pre-tournament"
         for threshold, round_name in ROUND_THRESHOLDS:
-            if n > threshold:
+            if n >= threshold:
                 current = round_name
-            elif n == 0:
+            else:
                 break
-        # Edge case: exactly at a threshold boundary
-        for threshold, round_name in ROUND_THRESHOLDS:
-            if n <= threshold:
-                return round_name
-        return "Championship"
+        return current
 
     def add_result(self, game_id, round_name, region, seed_a, team_a,
                    seed_b, team_b, score_a, score_b):

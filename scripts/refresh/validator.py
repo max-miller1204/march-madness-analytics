@@ -86,7 +86,7 @@ class DataValidator:
             # Score checks
             for key in ("score_a", "score_b"):
                 score = game.get(key)
-                if not isinstance(score, int) or score < 0:
+                if not isinstance(score, int) or score <= 0:
                     self.errors.append(
                         f"Game {gid}: {key}={score} is not a positive integer"
                     )
@@ -100,22 +100,6 @@ class DataValidator:
                 self.errors.append(
                     f"Game {gid}: winner '{game.get('winner')}' doesn't match scores"
                 )
-
-        # Check no team is both eliminated and advancing
-        eliminated = set()
-        advancing = set()
-        for game in completed_games:
-            winner = game["winner"]
-            loser = game["team_a"] if winner == game["team_b"] else game["team_b"]
-            advancing.add(winner)
-            eliminated.add(loser)
-
-        contradiction = advancing & eliminated
-        # A team can advance from one round and be eliminated in a later round,
-        # so only flag if the same team appears as a winner AFTER being eliminated
-        # For simplicity, we track the final state
-        # Actually contradictions are normal (team advances R64 but eliminated R32)
-        # so we don't flag these
 
         return len(self.errors) == 0
 

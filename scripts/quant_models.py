@@ -125,6 +125,26 @@ def _parse_bracket(bracket_df):
     return regions
 
 
+def _resolve_matchup(game_id, team_a, seed_a, team_b, seed_b, win_prob_fn, rng,
+                     locked_results=None):
+    """Resolve a single matchup, checking locked results first.
+
+    Returns (winner, w_seed, loser, l_seed).
+    """
+    if locked_results and game_id in locked_results:
+        locked_winner = locked_results[game_id]["winner"]
+        if locked_winner == team_a:
+            return (team_a, seed_a, team_b, seed_b)
+        elif locked_winner == team_b:
+            return (team_b, seed_b, team_a, seed_a)
+        print(f"  [WARN] Locked result for {game_id} names '{locked_winner}' "
+              f"but participants are '{team_a}' vs '{team_b}' — ignoring lock")
+    p = win_prob_fn(team_a, seed_a, team_b, seed_b, rng)
+    if rng.random() < p:
+        return (team_a, seed_a, team_b, seed_b)
+    return (team_b, seed_b, team_a, seed_a)
+
+
 def _simulate_region(matchups, win_prob_fn, rng, locked_results=None, region=None):
     """Simulate a single region (4 rounds, 8->4->2->1).
 
@@ -150,12 +170,13 @@ def _simulate_region(matchups, win_prob_fn, rng, locked_results=None, region=Non
             return None
         locked = locked_results[game_id]
         locked_winner = locked["winner"]
-        locked_seed = locked["seed"]
         if locked_winner == team_a:
             return (team_a, seed_a, team_b, seed_b, 1.0)
         elif locked_winner == team_b:
             return (team_b, seed_b, team_a, seed_a, 1.0)
-        return None  # locked winner doesn't match either team
+        print(f"  [WARN] Locked result for {game_id} names '{locked_winner}' "
+              f"but participants are '{team_a}' vs '{team_b}' — ignoring lock")
+        return None
 
     round_winners = []
     for idx, (team_a, seed_a, team_b, seed_b) in enumerate(matchups):
@@ -649,68 +670,28 @@ class EVOptimizedSimulator:
                     round_counters[rd_name] += 1
                     game_slot_wins[(rd_name, region, idx)][(w, ws, l, ls)] += 1
 
-            # Final Four semis
+            # Final Four semis + Championship
             if len(ff_teams) >= 4:
-                # FF game 1: check locked result for F1
                 ta, sa, _ra = ff_teams[0]
                 tb, sb, _rb = ff_teams[1]
-                ff1_locked = self.locked_results.get('F1')
-                if ff1_locked and ff1_locked['winner'] in (ta, tb):
-                    if ff1_locked['winner'] == ta:
-                        finalist_1 = (ta, sa)
-                        ff_game_1 = (ta, sa, tb, sb)
-                    else:
-                        finalist_1 = (tb, sb)
-                        ff_game_1 = (tb, sb, ta, sa)
-                else:
-                    p = self._win_prob(ta, sa, tb, sb, rng)
-                    if rng.random() < p:
-                        finalist_1 = (ta, sa)
-                        ff_game_1 = (ta, sa, tb, sb)
-                    else:
-                        finalist_1 = (tb, sb)
-                        ff_game_1 = (tb, sb, ta, sa)
+                w, ws, l, ls = _resolve_matchup(
+                    'F1', ta, sa, tb, sb, self._win_prob, rng, self.locked_results)
+                finalist_1 = (w, ws)
+                game_slot_wins[('Final Four', 'National', 0)][(w, ws, l, ls)] += 1
 
-                # FF game 2: check locked result for F2
                 ta, sa, _ra = ff_teams[2]
                 tb, sb, _rb = ff_teams[3]
-                ff2_locked = self.locked_results.get('F2')
-                if ff2_locked and ff2_locked['winner'] in (ta, tb):
-                    if ff2_locked['winner'] == ta:
-                        finalist_2 = (ta, sa)
-                        ff_game_2 = (ta, sa, tb, sb)
-                    else:
-                        finalist_2 = (tb, sb)
-                        ff_game_2 = (tb, sb, ta, sa)
-                else:
-                    p = self._win_prob(ta, sa, tb, sb, rng)
-                    if rng.random() < p:
-                        finalist_2 = (ta, sa)
-                        ff_game_2 = (ta, sa, tb, sb)
-                    else:
-                        finalist_2 = (tb, sb)
-                        ff_game_2 = (tb, sb, ta, sa)
+                w, ws, l, ls = _resolve_matchup(
+                    'F2', ta, sa, tb, sb, self._win_prob, rng, self.locked_results)
+                finalist_2 = (w, ws)
+                game_slot_wins[('Final Four', 'National', 1)][(w, ws, l, ls)] += 1
 
-                for i, ff_game in enumerate([ff_game_1, ff_game_2]):
-                    game_slot_wins[('Final Four', 'National', i)][ff_game] += 1
-
-                # Championship: check locked result for C1
                 ta, sa = finalist_1
                 tb, sb = finalist_2
-                c1_locked = self.locked_results.get('C1')
-                if c1_locked and c1_locked['winner'] in (ta, tb):
-                    if c1_locked['winner'] == ta:
-                        champ_game = (ta, sa, tb, sb)
-                    else:
-                        champ_game = (tb, sb, ta, sa)
-                else:
-                    p = self._win_prob(ta, sa, tb, sb, rng)
-                    if rng.random() < p:
-                        champ_game = (ta, sa, tb, sb)
-                    else:
-                        champ_game = (tb, sb, ta, sa)
-                champ_counts[champ_game[0]] += 1
-                game_slot_wins[('Championship', 'National', 0)][champ_game] += 1
+                w, ws, l, ls = _resolve_matchup(
+                    'C1', ta, sa, tb, sb, self._win_prob, rng, self.locked_results)
+                champ_counts[w] += 1
+                game_slot_wins[('Championship', 'National', 0)][(w, ws, l, ls)] += 1
 
         n = self.n_sims
 
@@ -904,68 +885,28 @@ class QuantEnhancedSimulator:
                     round_counters[rd_name] += 1
                     game_slot_wins[(rd_name, region, idx)][(w, ws, l, ls)] += 1
 
-            # Final Four: semi-finals
+            # Final Four semis + Championship
             if len(ff_teams) >= 4:
-                # FF game 1: check locked result for F1
                 ta, sa, _ra = ff_teams[0]
                 tb, sb, _rb = ff_teams[1]
-                ff1_locked = self.locked_results.get('F1')
-                if ff1_locked and ff1_locked['winner'] in (ta, tb):
-                    if ff1_locked['winner'] == ta:
-                        finalist_1 = (ta, sa)
-                        ff_game_1 = (ta, sa, tb, sb)
-                    else:
-                        finalist_1 = (tb, sb)
-                        ff_game_1 = (tb, sb, ta, sa)
-                else:
-                    p = self._win_prob(ta, sa, tb, sb, rng)
-                    if rng.random() < p:
-                        finalist_1 = (ta, sa)
-                        ff_game_1 = (ta, sa, tb, sb)
-                    else:
-                        finalist_1 = (tb, sb)
-                        ff_game_1 = (tb, sb, ta, sa)
+                w, ws, l, ls = _resolve_matchup(
+                    'F1', ta, sa, tb, sb, self._win_prob, rng, self.locked_results)
+                finalist_1 = (w, ws)
+                game_slot_wins[('Final Four', 'National', 0)][(w, ws, l, ls)] += 1
 
-                # FF game 2: check locked result for F2
                 ta, sa, _ra = ff_teams[2]
                 tb, sb, _rb = ff_teams[3]
-                ff2_locked = self.locked_results.get('F2')
-                if ff2_locked and ff2_locked['winner'] in (ta, tb):
-                    if ff2_locked['winner'] == ta:
-                        finalist_2 = (ta, sa)
-                        ff_game_2 = (ta, sa, tb, sb)
-                    else:
-                        finalist_2 = (tb, sb)
-                        ff_game_2 = (tb, sb, ta, sa)
-                else:
-                    p = self._win_prob(ta, sa, tb, sb, rng)
-                    if rng.random() < p:
-                        finalist_2 = (ta, sa)
-                        ff_game_2 = (ta, sa, tb, sb)
-                    else:
-                        finalist_2 = (tb, sb)
-                        ff_game_2 = (tb, sb, ta, sa)
+                w, ws, l, ls = _resolve_matchup(
+                    'F2', ta, sa, tb, sb, self._win_prob, rng, self.locked_results)
+                finalist_2 = (w, ws)
+                game_slot_wins[('Final Four', 'National', 1)][(w, ws, l, ls)] += 1
 
-                for i, fg in enumerate([ff_game_1, ff_game_2]):
-                    game_slot_wins[('Final Four', 'National', i)][fg] += 1
-
-                # Championship: check locked result for C1
                 ta, sa = finalist_1
                 tb, sb = finalist_2
-                c1_locked = self.locked_results.get('C1')
-                if c1_locked and c1_locked['winner'] in (ta, tb):
-                    if c1_locked['winner'] == ta:
-                        champ_game = (ta, sa, tb, sb)
-                    else:
-                        champ_game = (tb, sb, ta, sa)
-                else:
-                    p = self._win_prob(ta, sa, tb, sb, rng)
-                    if rng.random() < p:
-                        champ_game = (ta, sa, tb, sb)
-                    else:
-                        champ_game = (tb, sb, ta, sa)
-                champ_counts[champ_game[0]] += 1
-                game_slot_wins[('Championship', 'National', 0)][champ_game] += 1
+                w, ws, l, ls = _resolve_matchup(
+                    'C1', ta, sa, tb, sb, self._win_prob, rng, self.locked_results)
+                champ_counts[w] += 1
+                game_slot_wins[('Championship', 'National', 0)][(w, ws, l, ls)] += 1
 
         # Compute probabilities
         n = self.n_sims
