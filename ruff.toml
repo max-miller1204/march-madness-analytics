@@ -1,4 +1,4 @@
-exclude = ["Quant-Guild-Library"]
+exclude = ["Quant-Guild-Library", "*.ipynb"]
 
 [lint]
 # Relax rules for existing codebase — tighten over time
