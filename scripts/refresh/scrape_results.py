@@ -740,7 +740,10 @@ def scrape_tournament_results(
         try:
             validator = DataValidator()
             all_games = existing_games + valid_games
-            validator.validate(all_games)
+            validator.validate_tournament_results(all_games)
+            if validator.errors:
+                for err in validator.errors:
+                    logger.warning("DataValidator: %s", err)
         except Exception as exc:
             logger.warning("DataValidator raised: %s", exc)
 
@@ -754,7 +757,17 @@ def scrape_tournament_results(
         try:
             ts = TournamentState(state_path)
             for g in valid_games:
-                ts.add_result(g)
+                ts.add_result(
+                    game_id=g["game_id"],
+                    round_name=g["round"],
+                    region=g.get("region", ""),
+                    seed_a=g.get("seed_a", 0),
+                    team_a=g["team_a"],
+                    seed_b=g.get("seed_b", 0),
+                    team_b=g["team_b"],
+                    score_a=g["score_a"],
+                    score_b=g["score_b"],
+                )
                 added += 1
             ts.save()
         except Exception as exc:

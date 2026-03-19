@@ -142,8 +142,40 @@ def step_changelog(**kwargs):
     if gen is not None and save is not None:
         print("\n--- Generating changelog ---")
         try:
-            entry = gen()
-            save(entry)
+            # Load completed games from tournament state
+            state_path = PROJECT_ROOT / "scraped_data" / "tournament_state.json"
+            completed_games = []
+            if state_path.exists():
+                import json
+                with open(state_path) as f:
+                    state = json.load(f)
+                for g in state.get("completed_games", []):
+                    completed_games.append({
+                        "game_id": g.get("game_id", "?"),
+                        "result": (f"({g.get('seed_a', '?')}) {g.get('team_a', '?')} "
+                                   f"{g.get('score_a', '?')}-{g.get('score_b', '?')} "
+                                   f"{g.get('team_b', '?')} ({g.get('seed_b', '?')})"),
+                        "predicted_winner": g.get("predicted_winner", "N/A"),
+                        "predicted_prob": g.get("predicted_prob", 0.0),
+                        "correct": g.get("correct", False),
+                        "upset": g.get("upset", False),
+                    })
+
+            # Load accuracy summary if available
+            accuracy_path = PROJECT_ROOT / "scraped_data" / "accuracy_log.json"
+            accuracy_summary = None
+            if accuracy_path.exists():
+                with open(accuracy_path) as f:
+                    acc_data = json.load(f)
+                runs = acc_data.get("runs", [])
+                if runs:
+                    accuracy_summary = runs[-1].get("summary")
+
+            content = gen(
+                completed_games=completed_games,
+                accuracy_summary=accuracy_summary,
+            )
+            save(content)
         except Exception as exc:
             print(f"[WARN] changelog failed: {exc}")
     else:
