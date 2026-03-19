@@ -8,6 +8,7 @@ historical priors, and Monte Carlo bracket simulation.
 
 import os
 import warnings
+from collections import defaultdict
 from pathlib import Path
 
 import numpy as np
@@ -90,6 +91,81 @@ def _build_team_margins(games_df):
         margins = (g['team_score'].astype(float) - g['opp_score'].astype(float)).values
         team_margins[_resolve_name(team)] = margins
     return team_margins
+
+
+def _build_lookups(kenpom_df):
+    """Build net_lookup and seed_lookup dicts from a KenPom DataFrame."""
+    name_col = 'StdName' if 'StdName' in kenpom_df.columns else 'Team'
+    net_col = 'adjusted_NetRtg' if 'adjusted_NetRtg' in kenpom_df.columns else 'NetRtg'
+    net_lookup = {}
+    seed_lookup = {}
+    for _, row in kenpom_df.iterrows():
+        net_lookup[row[name_col]] = row[net_col]
+        if pd.notna(row.get('Seed')):
+            seed_lookup[row[name_col]] = int(row['Seed'])
+    return net_lookup, seed_lookup
+
+
+def _parse_bracket(bracket_df):
+    """Parse bracket.csv into region -> list of R64 matchups."""
+    regions = {}
+    for _, row in bracket_df.iterrows():
+        if row['Round'] != 'R64':
+            continue
+        region = row['Region']
+        if region not in regions:
+            regions[region] = []
+        team_a = _resolve_name(row['TeamA'].split('/')[0].strip())
+        team_b = _resolve_name(row['TeamB'].split('/')[0].strip())
+        seed_a = int(row['SeedA'])
+        seed_b = int(row['SeedB'])
+        regions[region].append((team_a, seed_a, team_b, seed_b))
+    return regions
+
+
+def _simulate_region(matchups, win_prob_fn, rng):
+    """Simulate a single region (4 rounds, 8->4->2->1).
+
+    Args:
+        matchups: list of (team_a, seed_a, team_b, seed_b) tuples
+        win_prob_fn: callable(team_a, seed_a, team_b, seed_b, rng) -> float
+        rng: numpy random generator
+
+    Returns (winner_team, winner_seed, game_results).
+    game_results: list of (round_name, winner, w_seed, loser, l_seed, win_p)
+    """
+    round_names = ['Round of 64', 'Round of 32', 'Sweet 16', 'Elite 8']
+    game_results = []
+
+    round_winners = []
+    for team_a, seed_a, team_b, seed_b in matchups:
+        p = win_prob_fn(team_a, seed_a, team_b, seed_b, rng)
+        if rng.random() < p:
+            round_winners.append((team_a, seed_a))
+            game_results.append((round_names[0], team_a, seed_a, team_b, seed_b, p))
+        else:
+            round_winners.append((team_b, seed_b))
+            game_results.append((round_names[0], team_b, seed_b, team_a, seed_a, 1 - p))
+
+    for rd in range(1, 4):
+        next_round = []
+        for i in range(0, len(round_winners), 2):
+            if i + 1 < len(round_winners):
+                ta, sa = round_winners[i]
+                tb, sb = round_winners[i + 1]
+                p = win_prob_fn(ta, sa, tb, sb, rng)
+                if rng.random() < p:
+                    next_round.append((ta, sa))
+                    game_results.append((round_names[rd], ta, sa, tb, sb, p))
+                else:
+                    next_round.append((tb, sb))
+                    game_results.append((round_names[rd], tb, sb, ta, sa, 1 - p))
+            else:
+                next_round.append(round_winners[i])
+        round_winners = next_round
+
+    winner = round_winners[0] if round_winners else (None, None)
+    return winner[0], winner[1], game_results
 
 
 # ===========================================================================
@@ -256,9 +332,11 @@ class KalmanMomentum:
             return
 
         # Build NetRtg lookup
+        name_col = 'StdName' if 'StdName' in kenpom_df.columns else 'Team'
+        net_col = 'adjusted_NetRtg' if 'adjusted_NetRtg' in kenpom_df.columns else 'NetRtg'
         net_lookup = {}
         for _, row in kenpom_df.iterrows():
-            net_lookup[row['Team']] = row['NetRtg']
+            net_lookup[row[name_col]] = row[net_col]
 
         raw_momentum = {}
 
@@ -461,16 +539,8 @@ class EVOptimizedSimulator:
         self.pub = PublicOwnership()
 
         # Build lookups
-        name_col = 'StdName' if 'StdName' in self.kenpom_df.columns else 'Team'
-        net_col = 'adjusted_NetRtg' if 'adjusted_NetRtg' in self.kenpom_df.columns else 'NetRtg'
-        self.net_lookup = {}
-        self.seed_lookup = {}
-        for _, row in self.kenpom_df.iterrows():
-            self.net_lookup[row[name_col]] = row[net_col]
-            if pd.notna(row.get('Seed')):
-                self.seed_lookup[row[name_col]] = int(row['Seed'])
-
-        self.region_games = self._parse_bracket()
+        self.net_lookup, self.seed_lookup = _build_lookups(self.kenpom_df)
+        self.region_games = _parse_bracket(self.bracket_df)
 
         # Results
         self.ev_bracket = {}
@@ -479,22 +549,6 @@ class EVOptimizedSimulator:
         self.champion = None
         self.total_ev = 0.0
         self.total_leverage_ev = 0.0
-
-    def _parse_bracket(self):
-        """Parse bracket.csv into region -> list of R64 matchups."""
-        regions = {}
-        for _, row in self.bracket_df.iterrows():
-            if row['Round'] != 'R64':
-                continue
-            region = row['Region']
-            if region not in regions:
-                regions[region] = []
-            team_a = _resolve_name(row['TeamA'].split('/')[0].strip())
-            team_b = _resolve_name(row['TeamB'].split('/')[0].strip())
-            seed_a = int(row['SeedA'])
-            seed_b = int(row['SeedB'])
-            regions[region].append((team_a, seed_a, team_b, seed_b))
-        return regions
 
     def _win_prob(self, team_a, seed_a, team_b, seed_b, rng):
         """Win probability WITHOUT historical prior blending (pure model)."""
@@ -524,41 +578,6 @@ class EVOptimizedSimulator:
         # NO prior blending — pure model probability
         return np.clip(p_model, 0.01, 0.99)
 
-    def _simulate_region(self, matchups, rng):
-        """Simulate a single region. Returns (winner, seed, game_results)."""
-        round_names = ['Round of 64', 'Round of 32', 'Sweet 16', 'Elite 8']
-        game_results = []
-
-        round_winners = []
-        for team_a, seed_a, team_b, seed_b in matchups:
-            p = self._win_prob(team_a, seed_a, team_b, seed_b, rng)
-            if rng.random() < p:
-                round_winners.append((team_a, seed_a))
-                game_results.append((round_names[0], team_a, seed_a, team_b, seed_b, p))
-            else:
-                round_winners.append((team_b, seed_b))
-                game_results.append((round_names[0], team_b, seed_b, team_a, seed_a, 1 - p))
-
-        for rd in range(1, 4):
-            next_round = []
-            for i in range(0, len(round_winners), 2):
-                if i + 1 < len(round_winners):
-                    ta, sa = round_winners[i]
-                    tb, sb = round_winners[i + 1]
-                    p = self._win_prob(ta, sa, tb, sb, rng)
-                    if rng.random() < p:
-                        next_round.append((ta, sa))
-                        game_results.append((round_names[rd], ta, sa, tb, sb, p))
-                    else:
-                        next_round.append((tb, sb))
-                        game_results.append((round_names[rd], tb, sb, ta, sa, 1 - p))
-                else:
-                    next_round.append(round_winners[i])
-            round_winners = next_round
-
-        winner = round_winners[0] if round_winners else (None, None)
-        return winner[0], winner[1], game_results
-
     def run(self):
         """3-phase run: simulate, compute per-slot EV, apply leverage.
 
@@ -571,8 +590,8 @@ class EVOptimizedSimulator:
         # Phase 1: Monte Carlo simulation — count wins per slot
         # slot key: (round_name, region_or_label, game_idx)
         # value: {(winner, w_seed, loser, l_seed): count}
-        game_slot_wins = {}
-        champ_counts = {}
+        game_slot_wins = defaultdict(lambda: defaultdict(int))
+        champ_counts = defaultdict(int)
 
         for _sim in range(self.n_sims):
             ff_teams = []
@@ -580,19 +599,16 @@ class EVOptimizedSimulator:
             for region in region_order:
                 if region not in self.region_games:
                     continue
-                winner, seed, game_results = self._simulate_region(
-                    self.region_games[region], rng)
+                winner, seed, game_results = _simulate_region(
+                    self.region_games[region], self._win_prob, rng)
                 if winner:
                     ff_teams.append((winner, seed, region))
 
-                round_counters = {}
+                round_counters = defaultdict(int)
                 for rd_name, w, ws, l, ls, wp in game_results:
-                    idx = round_counters.get(rd_name, 0)
-                    round_counters[rd_name] = idx + 1
-                    key = (rd_name, region, idx)
-                    game_slot_wins.setdefault(key, {})
-                    result_key = (w, ws, l, ls)
-                    game_slot_wins[key][result_key] = game_slot_wins[key].get(result_key, 0) + 1
+                    idx = round_counters[rd_name]
+                    round_counters[rd_name] += 1
+                    game_slot_wins[(rd_name, region, idx)][(w, ws, l, ls)] += 1
 
             # Final Four semis
             if len(ff_teams) >= 4:
@@ -617,9 +633,7 @@ class EVOptimizedSimulator:
                     ff_game_2 = (tb, sb, ta, sa)
 
                 for i, ff_game in enumerate([ff_game_1, ff_game_2]):
-                    key = ('Final Four', 'National', i)
-                    game_slot_wins.setdefault(key, {})
-                    game_slot_wins[key][ff_game] = game_slot_wins[key].get(ff_game, 0) + 1
+                    game_slot_wins[('Final Four', 'National', i)][ff_game] += 1
 
                 # Championship
                 ta, sa = finalist_1
@@ -629,17 +643,14 @@ class EVOptimizedSimulator:
                     champ_game = (ta, sa, tb, sb)
                 else:
                     champ_game = (tb, sb, ta, sa)
-                champ_counts[champ_game[0]] = champ_counts.get(champ_game[0], 0) + 1
-
-                key = ('Championship', 'National', 0)
-                game_slot_wins.setdefault(key, {})
-                game_slot_wins[key][champ_game] = game_slot_wins[key].get(champ_game, 0) + 1
+                champ_counts[champ_game[0]] += 1
+                game_slot_wins[('Championship', 'National', 0)][champ_game] += 1
 
         n = self.n_sims
 
         # Phase 2 + 3: Per-slot EV and leverage-weighted picks (single pass)
-        self.ev_bracket = {}
-        self.leverage_bracket = {}
+        self.ev_bracket = defaultdict(list)
+        self.leverage_bracket = defaultdict(list)
         self.slot_evs = {}
 
         for (rd_name, region, idx), outcomes in game_slot_wins.items():
@@ -686,7 +697,6 @@ class EVOptimizedSimulator:
                 'win_pct': ev_info['count'] / n,
                 'points': points,
             }
-            self.ev_bracket.setdefault(rd_name, [])
             self.ev_bracket[rd_name].append({
                 'winner': best_ev_team, 'winner_seed': ev_info['seed'],
                 'loser': ev_info['loser'], 'loser_seed': ev_info['loser_seed'],
@@ -697,7 +707,6 @@ class EVOptimizedSimulator:
 
             # Leverage bracket entry
             lev_info = team_ev_info[best_lev_team]
-            self.leverage_bracket.setdefault(rd_name, [])
             self.leverage_bracket[rd_name].append({
                 'winner': best_lev_team, 'winner_seed': lev_info['seed'],
                 'loser': lev_info['loser'], 'loser_seed': lev_info['loser_seed'],
@@ -756,43 +765,15 @@ class QuantEnhancedSimulator:
         self.n_sims = n_sims
         self.seed = seed
 
-        # Build NetRtg lookup (support both 'Team' and 'StdName' column names)
-        self.net_lookup = {}
-        name_col = 'StdName' if 'StdName' in self.kenpom_df.columns else 'Team'
-        net_col = 'adjusted_NetRtg' if 'adjusted_NetRtg' in self.kenpom_df.columns else 'NetRtg'
-        for _, row in self.kenpom_df.iterrows():
-            self.net_lookup[row[name_col]] = row[net_col]
-
-        # Build seed lookup
-        self.seed_lookup = {}
-        for _, row in self.kenpom_df.iterrows():
-            if pd.notna(row.get('Seed')):
-                self.seed_lookup[row[name_col]] = int(row['Seed'])
-
-        # Parse bracket
-        self.region_games = self._parse_bracket()
+        # Build lookups
+        self.net_lookup, self.seed_lookup = _build_lookups(self.kenpom_df)
+        self.region_games = _parse_bracket(self.bracket_df)
 
         # Results
         self.bracket_picks = {}
         self.round_probs = {}
         self.ff_probs = {}
         self.champion = None
-
-    def _parse_bracket(self):
-        """Parse bracket.csv into region → list of R64 matchups."""
-        regions = {}
-        for _, row in self.bracket_df.iterrows():
-            if row['Round'] != 'R64':
-                continue
-            region = row['Region']
-            if region not in regions:
-                regions[region] = []
-            team_a = _resolve_name(row['TeamA'].split('/')[0].strip())
-            team_b = _resolve_name(row['TeamB'].split('/')[0].strip())
-            seed_a = int(row['SeedA'])
-            seed_b = int(row['SeedB'])
-            regions[region].append((team_a, seed_a, team_b, seed_b))
-        return regions
 
     def _win_prob(self, team_a, seed_a, team_b, seed_b, rng):
         """Compute win probability for team_a vs team_b with all enhancements."""
@@ -827,55 +808,14 @@ class QuantEnhancedSimulator:
 
         return np.clip(p_model, 0.01, 0.99)
 
-    def _simulate_region(self, matchups, rng):
-        """Simulate a single region (4 rounds, 8→4→2→1).
-        Returns (winner_team, winner_seed, per_game_results).
-        per_game_results: list of (round_name, winner, w_seed, loser, l_seed, win_p)
-        """
-        round_names = ['Round of 64', 'Round of 32', 'Sweet 16', 'Elite 8']
-        game_results = []
-
-        # R64: 8 games → 8 winners
-        round_winners = []
-        for team_a, seed_a, team_b, seed_b in matchups:
-            p = self._win_prob(team_a, seed_a, team_b, seed_b, rng)
-            if rng.random() < p:
-                round_winners.append((team_a, seed_a))
-                game_results.append((round_names[0], team_a, seed_a, team_b, seed_b, p))
-            else:
-                round_winners.append((team_b, seed_b))
-                game_results.append((round_names[0], team_b, seed_b, team_a, seed_a, 1 - p))
-
-        # R32, S16, E8
-        for rd in range(1, 4):
-            next_round = []
-            for i in range(0, len(round_winners), 2):
-                if i + 1 < len(round_winners):
-                    ta, sa = round_winners[i]
-                    tb, sb = round_winners[i + 1]
-                    p = self._win_prob(ta, sa, tb, sb, rng)
-                    if rng.random() < p:
-                        next_round.append((ta, sa))
-                        game_results.append((round_names[rd], ta, sa, tb, sb, p))
-                    else:
-                        next_round.append((tb, sb))
-                        game_results.append((round_names[rd], tb, sb, ta, sa, 1 - p))
-                else:
-                    next_round.append(round_winners[i])
-            round_winners = next_round
-
-        winner = round_winners[0] if round_winners else (None, None)
-        return winner[0], winner[1], game_results
-
     def run(self):
         """Run full Monte Carlo bracket simulation. Returns dict with bracket_picks, ff_probs, champion."""
         rng = np.random.default_rng(self.seed)
         region_order = ['East', 'South', 'West', 'Midwest']
 
-        ff_counts = {}       # team → count reaching FF
-        champ_counts = {}    # team → count winning championship
-        # Track per-game-slot winner counts: (round, region_or_label, game_idx) → {team: count}
-        game_slot_wins = {}  # (round_name, slot_key) → {(winner, w_seed, loser, l_seed): count}
+        ff_counts = defaultdict(int)
+        champ_counts = defaultdict(int)
+        game_slot_wins = defaultdict(lambda: defaultdict(int))
 
         for sim in range(self.n_sims):
             ff_teams = []
@@ -883,26 +823,22 @@ class QuantEnhancedSimulator:
             for region in region_order:
                 if region not in self.region_games:
                     continue
-                winner, seed, game_results = self._simulate_region(
-                    self.region_games[region], rng)
+                winner, seed, game_results = _simulate_region(
+                    self.region_games[region], self._win_prob, rng)
                 if winner:
-                    ff_counts[winner] = ff_counts.get(winner, 0) + 1
+                    ff_counts[winner] += 1
                     ff_teams.append((winner, seed, region))
 
-                # Track each game result
-                round_counters = {}
+                round_counters = defaultdict(int)
                 for rd_name, w, ws, l, ls, wp in game_results:
-                    idx = round_counters.get(rd_name, 0)
-                    round_counters[rd_name] = idx + 1
-                    key = (rd_name, region, idx)
-                    game_slot_wins.setdefault(key, {})
-                    result_key = (w, ws, l, ls)
-                    game_slot_wins[key][result_key] = game_slot_wins[key].get(result_key, 0) + 1
+                    idx = round_counters[rd_name]
+                    round_counters[rd_name] += 1
+                    game_slot_wins[(rd_name, region, idx)][(w, ws, l, ls)] += 1
 
             # Final Four: semi-finals
             if len(ff_teams) >= 4:
-                ta, sa, ra = ff_teams[0]
-                tb, sb, rb = ff_teams[1]
+                ta, sa, _ra = ff_teams[0]
+                tb, sb, _rb = ff_teams[1]
                 p = self._win_prob(ta, sa, tb, sb, rng)
                 if rng.random() < p:
                     finalist_1 = (ta, sa)
@@ -911,8 +847,8 @@ class QuantEnhancedSimulator:
                     finalist_1 = (tb, sb)
                     ff_game_1 = (tb, sb, ta, sa)
 
-                ta, sa, ra = ff_teams[2]
-                tb, sb, rb = ff_teams[3]
+                ta, sa, _ra = ff_teams[2]
+                tb, sb, _rb = ff_teams[3]
                 p = self._win_prob(ta, sa, tb, sb, rng)
                 if rng.random() < p:
                     finalist_2 = (ta, sa)
@@ -921,11 +857,8 @@ class QuantEnhancedSimulator:
                     finalist_2 = (tb, sb)
                     ff_game_2 = (tb, sb, ta, sa)
 
-                # Track FF games
                 for i, fg in enumerate([ff_game_1, ff_game_2]):
-                    key = ('Final Four', 'National', i)
-                    game_slot_wins.setdefault(key, {})
-                    game_slot_wins[key][fg] = game_slot_wins[key].get(fg, 0) + 1
+                    game_slot_wins[('Final Four', 'National', i)][fg] += 1
 
                 # Championship
                 ta, sa = finalist_1
@@ -935,11 +868,8 @@ class QuantEnhancedSimulator:
                     champ_game = (ta, sa, tb, sb)
                 else:
                     champ_game = (tb, sb, ta, sa)
-                champ_counts[champ_game[0]] = champ_counts.get(champ_game[0], 0) + 1
-
-                key = ('Championship', 'National', 0)
-                game_slot_wins.setdefault(key, {})
-                game_slot_wins[key][champ_game] = game_slot_wins[key].get(champ_game, 0) + 1
+                champ_counts[champ_game[0]] += 1
+                game_slot_wins[('Championship', 'National', 0)][champ_game] += 1
 
         # Compute probabilities
         n = self.n_sims
@@ -952,21 +882,18 @@ class QuantEnhancedSimulator:
             self.champion = "Unknown"
 
         # Build bracket_picks as round_name → list of game dicts (modal outcomes)
-        round_order = ['Round of 64', 'Round of 32', 'Sweet 16', 'Elite 8', 'Final Four', 'Championship']
-        self.bracket_picks = {}
+        self.bracket_picks = defaultdict(list)
         for (rd_name, region, idx), outcomes in game_slot_wins.items():
             modal = max(outcomes, key=outcomes.get)
             w, ws, l, ls = modal
             win_count = outcomes[modal]
-            game_info = {
+            self.bracket_picks[rd_name].append({
                 'winner': w, 'winner_seed': ws,
                 'loser': l, 'loser_seed': ls,
                 'win_prob': win_count / n,
                 'region': region,
                 'upset': ws > ls,
-            }
-            self.bracket_picks.setdefault(rd_name, [])
-            self.bracket_picks[rd_name].append(game_info)
+            })
 
         # Sort each round's games by region then index
         for rd in self.bracket_picks:

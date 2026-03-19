@@ -9,6 +9,7 @@ A composite analytical pipeline that predicts NCAA Tournament Final Four teams a
 3. **Quantitative Enhancements** -- GARCH volatility replaces fixed win-probability divisor, HMM detects team regime states, Kalman filter tracks momentum, historical seed priors provide Bayesian blending
 4. **Monte Carlo Simulation** -- 10,000 full-bracket simulations (63 games each) with both baseline and enhanced models
 5. **Seed-Constrained Optimization** -- Brute-force search for the highest-scoring Final Four with seed sum >= 15
+6. **EV-Optimized Bracket** -- Unconstrained per-slot expected value optimization with contrarian leverage adjustment
 
 ## Data Sources
 
@@ -106,51 +107,105 @@ Each model runs 10,000 full-bracket simulations (63 games: R64 through Champions
 
 ## Results
 
-### Optimal Final Four
+### Optimal Final Four (Seed-Constrained)
 
-**Duke | Vanderbilt | Arkansas | Texas Tech** (Seed sum: 1+5+4+5 = 15)
+**St. John's | Illinois | Arizona | Tennessee** (Seed sum: 5+3+1+6 = 15)
 
 | Pick | Region | Seed | KP# | NET# | Composite | FF Prob | Type |
 |------|--------|------|-----|------|-----------|---------|------|
-| Duke | East | 1 | #1 | #1 | 87.5 | 54.6% | Chalk |
-| Vanderbilt | South | 5 | #12 | #13 | 72.4 | 8.2% | Dark Horse |
-| Arkansas | West | 4 | #15 | #15 | 70.4 | 7.4% | Moderate |
-| Texas Tech | Midwest | 5 | #20 | #19 | 67.6 | 4.9% | Dark Horse |
+| Arizona | West | 1 | #2 | #3 | 86.6 | 49.7% | Chalk |
+| Illinois | South | 3 | #7 | #8 | 74.5 | 23.1% | Moderate |
+| St. John's | East | 5 | #17 | #16 | 71.3 | 6.4% | Dark Horse |
+| Tennessee | Midwest | 6 | #16 | #20 | 67.8 | 4.8% | Dark Horse |
 
 ### Top 20 by Composite Score
 
 | # | Team | Region | Seed | Composite | NetRtg | NET# | SOR | WAB |
 |---|------|--------|------|-----------|--------|------|-----|-----|
-| 1 | Duke | East | 1 | 87.5 | 38.90 | 1 | 3 | 2 |
-| 2 | Arizona | West | 1 | 86.5 | 37.62 | 3 | 1 | 3 |
-| 3 | Michigan | Midwest | 1 | 85.7 | 37.58 | 2 | 2 | 1 |
-| 4 | Florida | South | 1 | 79.1 | 33.78 | 4 | 5 | 6 |
-| 5 | Houston | South | 2 | 78.5 | 33.39 | 5 | 6 | 5 |
-| 6 | Gonzaga | West | 3 | 76.3 | 28.10 | 7 | 11 | 17 |
-| 7 | Iowa State | Midwest | 2 | 76.2 | 32.38 | 6 | 14 | 9 |
-| 8 | Purdue | West | 2 | 75.4 | 31.19 | 9 | 7 | 4 |
-| 9 | UConn | East | 2 | 75.2 | 27.85 | 10 | 4 | 7 |
-| 10 | Illinois | South | 3 | 74.2 | 32.09 | 8 | 17 | 18 |
-| 11 | Michigan State | East | 3 | 73.4 | 28.30 | 11 | 13 | 12 |
-| 12 | Virginia | Midwest | 3 | 73.1 | 26.71 | 12 | 9 | 8 |
-| 13 | Vanderbilt | South | 5 | 72.4 | 27.50 | 13 | 12 | 10 |
-| 14 | Nebraska | South | 4 | 71.9 | 26.15 | 14 | 10 | 13 |
-| 15 | St. John's | East | 5 | 70.5 | 25.89 | 16 | 16 | 14 |
-| 16 | Arkansas | West | 4 | 70.4 | 26.04 | 15 | 8 | 11 |
-| 17 | Alabama | Midwest | 4 | 69.7 | 25.70 | 18 | 15 | 15 |
-| 18 | Kansas | East | 4 | 68.4 | 24.41 | 21 | 18 | 16 |
-| 19 | Louisville | East | 6 | 67.8 | 25.42 | 17 | 26 | 24 |
-| 20 | Texas Tech | Midwest | 5 | 67.6 | 25.20 | 19 | 20 | 19 |
+| 1 | Arizona | West | 1 | 86.6 | 37.62 | 3 | 1 | 3 |
+| 2 | Duke | East | 1 | 85.2 | 38.90 | 1 | 3 | 2 |
+| 3 | Michigan | Midwest | 1 | 84.7 | 37.58 | 2 | 2 | 1 |
+| 4 | Florida | South | 1 | 79.4 | 33.78 | 4 | 5 | 6 |
+| 5 | Houston | South | 2 | 78.7 | 33.39 | 5 | 6 | 5 |
+| 6 | Iowa State | Midwest | 2 | 76.3 | 32.38 | 6 | 14 | 9 |
+| 7 | Purdue | West | 2 | 75.9 | 31.19 | 9 | 7 | 4 |
+| 8 | UConn | East | 2 | 75.7 | 27.85 | 10 | 4 | 7 |
+| 9 | Illinois | South | 3 | 74.5 | 32.09 | 8 | 17 | 18 |
+| 10 | Gonzaga | West | 3 | 74.2 | 28.10 | 7 | 11 | 17 |
+| 11 | Virginia | Midwest | 3 | 73.5 | 26.71 | 12 | 9 | 8 |
+| 12 | Michigan State | East | 3 | 73.2 | 28.30 | 11 | 13 | 12 |
+| 13 | Vanderbilt | South | 5 | 72.9 | 27.50 | 13 | 12 | 10 |
+| 14 | Nebraska | South | 4 | 72.0 | 26.15 | 14 | 10 | 13 |
+| 15 | St. John's | East | 5 | 71.3 | 25.89 | 16 | 16 | 14 |
+| 16 | Arkansas | West | 4 | 70.9 | 26.04 | 15 | 8 | 11 |
+| 17 | Alabama | Midwest | 4 | 70.4 | 25.70 | 18 | 15 | 15 |
+| 18 | Kansas | East | 4 | 69.2 | 24.41 | 21 | 18 | 16 |
+| 19 | Louisville | East | 6 | 68.4 | 25.42 | 17 | 26 | 24 |
+| 20 | Tennessee | Midwest | 6 | 67.8 | 26.02 | 20 | 22 | 23 |
 
-### Monte Carlo Simulation (10,000 sims per region)
+### Baseline Monte Carlo (10,000 sims per region)
 
 | East | | South | | West | | Midwest | |
 |------|---|-------|---|------|---|---------|---|
-| (1) Duke | 54.6% | (1) Florida | 30.3% | (1) Arizona | 48.9% | (1) Michigan | 47.8% |
-| (2) UConn | 12.8% | (2) Houston | 26.0% | (2) Purdue | 21.7% | (2) Iowa State | 24.1% |
-| (3) Michigan St | 11.8% | (3) Illinois | 22.3% | (3) Gonzaga | 11.3% | (3) Virginia | 8.2% |
-| (5) St. John's | 5.9% | (5) Vanderbilt | 8.2% | (4) Arkansas | 7.4% | (4) Alabama | 5.9% |
-| (4) Kansas | 5.1% | (4) Nebraska | 7.2% | (5) Wisconsin | 3.8% | (5) Texas Tech | 4.9% |
+| (1) Duke | 51.8% | (1) Florida | 30.5% | (1) Arizona | 49.7% | (1) Michigan | 47.5% |
+| (2) UConn | 13.7% | (2) Houston | 25.9% | (2) Purdue | 22.8% | (2) Iowa State | 24.4% |
+| (3) Michigan St | 12.1% | (3) Illinois | 23.1% | (3) Gonzaga | 10.2% | (3) Virginia | 8.4% |
+| (5) St. John's | 6.4% | (5) Vanderbilt | 8.1% | (4) Arkansas | 7.5% | (4) Alabama | 6.6% |
+| (4) Kansas | 5.5% | (4) Nebraska | 6.9% | (5) Wisconsin | 3.7% | (6) Tennessee | 4.8% |
+
+### Enhanced vs Baseline Final Four Probabilities (Top 16)
+
+The enhanced model (GARCH + HMM + Kalman + historical priors) redistributes probability mass away from top seeds and toward mid-seeds:
+
+| Team | Baseline FF% | Enhanced FF% | Diff |
+|------|:------------:|:------------:|:----:|
+| Duke | 51.8% | 31.1% | -20.7% |
+| Arizona | 49.7% | 30.4% | -19.3% |
+| Michigan | 47.5% | 29.0% | -18.5% |
+| Florida | 30.5% | 28.7% | -1.8% |
+| Iowa State | 24.5% | 19.0% | -5.5% |
+| Houston | 25.9% | 18.9% | -7.0% |
+| Purdue | 22.8% | 18.7% | -4.1% |
+| UConn | 13.7% | 17.6% | +3.9% |
+| Illinois | 23.1% | 13.5% | -9.6% |
+| Gonzaga | 10.2% | 13.1% | +2.9% |
+| Virginia | 8.4% | 13.1% | +4.8% |
+| Michigan State | 12.1% | 12.6% | +0.5% |
+| Arkansas | 7.5% | 9.9% | +2.4% |
+| Alabama | 6.6% | 9.7% | +3.1% |
+| Nebraska | 6.9% | 9.6% | +2.7% |
+| Kansas | 5.5% | 9.3% | +3.8% |
+
+### EV-Optimized Bracket (Unconstrained)
+
+ESPN fantasy scoring: R64=10, R32=20, S16=40, E8=80, FF=160, Championship=320.
+
+| Metric | Value |
+|--------|-------|
+| Total EV (pure) | 722.8 pts |
+| Total EV (leverage-adjusted) | 826.2 pts |
+| Predicted Champion | Duke |
+
+**Unconstrained EV-Optimal Final Four:**
+
+| Pick | Region | Seed | Composite |
+|------|--------|------|-----------|
+| Arizona | West | 1 | 86.6 |
+| Duke | East | 1 | 85.2 |
+| Illinois | South | 3 | 74.5 |
+| Michigan | Midwest | 1 | 84.7 |
+
+Overlap with constrained picks: 2 teams (Arizona, Illinois). Unconstrained seed sum: 6.
+
+### Leverage Sensitivity Analysis
+
+| Leverage Weight | Total EV | Leverage EV | Champion | Upsets |
+|:-:|:-:|:-:|:-:|:-:|
+| 0.0 | 722.8 | 722.8 | Duke | 3 |
+| 0.5 | 722.8 | 774.0 | Duke | 3 |
+| 1.0 | 722.8 | 826.2 | Duke | 6 |
+| 1.5 | 722.8 | 879.2 | Duke | 7 |
+| 2.0 | 722.8 | 932.8 | Duke | 8 |
 
 ### Visualizations
 
@@ -169,6 +224,12 @@ Each model runs 10,000 full-bracket simulations (63 games: R64 through Champions
 #### Quantitative Model Analysis
 ![Quant Analysis](images/quant_analysis.png)
 
+#### Injury Impact Dashboard
+![Injury Dashboard](images/injury_dashboard.png)
+
+#### EV-Optimized Bracket Analysis
+![EV Bracket Analysis](images/ev_bracket_analysis.png)
+
 ## Quantitative Models
 
 | Model | Class | Purpose |
@@ -178,6 +239,8 @@ Each model runs 10,000 full-bracket simulations (63 games: R64 through Champions
 | Kalman Filter | `KalmanMomentum` | Tracks late-season momentum as a random walk on margin residuals (Q=2, R=10) |
 | Historical Prior | `HistoricalPrior` | Bayesian blending with 1985+ seed matchup win rates (e.g., 1v16: 99.4%, 8v9: 51.5%) |
 | Enhanced Simulator | `QuantEnhancedSimulator` | Full 63-game MC combining all models with graceful degradation |
+| EV Optimizer | `EVOptimizedSimulator` | Unconstrained per-slot EV maximization with contrarian leverage overlay |
+| Public Ownership | `PublicOwnership` | Seed-based public pick % estimates for contrarian leverage scoring |
 
 All models are in `scripts/quant_models.py`. Each is optional -- the notebook and simulator degrade gracefully if any model fails or its dependencies (`arch`, `hmmlearn`, `filterpy`) are missing.
 
@@ -187,7 +250,7 @@ All models are in `scripts/quant_models.py`. Each is optional -- the notebook an
 final_four_analysis.ipynb         # Main notebook (run all cells)
 requirements.txt                  # Python dependencies
 scripts/
-  quant_models.py                 # GARCH, HMM, Kalman, Prior, Enhanced Simulator
+  quant_models.py                 # GARCH, HMM, Kalman, Prior, EV Optimizer, Enhanced Simulator
   scrape_historical_brackets.py   # Scrapes Wikipedia for historical seed win rates
   scrape_net_teamsheets.py        # Scrapes Warren Nolan team sheets
   filter_tournament_teams.py      # Filters scraped data to tournament teams
@@ -203,6 +266,14 @@ scraped_data/
   injuries.csv                    # Injury reports (tournament teams only)
   player_stats.csv                # Per-player MPG/PPG for tournament teams
   injury_adjustments.csv          # Injury penalties + adjusted NetRtg per team
+images/
+  efficiency_scatter.png          # ORtg vs DRtg scatter plot
+  composite_bars.png              # Top 25 composite score bar chart
+  radar_charts.png                # Regional contender radar comparisons
+  seed_ortg.png                   # Seed constraint configs + dark horse candidates
+  quant_analysis.png              # Baseline vs enhanced FF probs + GARCH volatility
+  injury_dashboard.png            # Injury impact visualization
+  ev_bracket_analysis.png         # EV by round + top 10 highest-EV picks
 ```
 
 ## Key Metrics Glossary
@@ -220,3 +291,4 @@ scraped_data/
 | GARCH Vol | quant_models.py | Per-team performance volatility from GARCH(1,1) on game margins |
 | HMM State | quant_models.py | Current regime (hot/cold) from Gaussian Hidden Markov Model |
 | Kalman Momentum | quant_models.py | Late-season trend from Kalman-filtered margin residuals (0-100) |
+| Leverage EV | quant_models.py | EV weighted by inverse public ownership for contrarian edge |
