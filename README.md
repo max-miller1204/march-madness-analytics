@@ -2,6 +2,9 @@
 
 A composite analytical pipeline that predicts NCAA Tournament Final Four teams and produces a full 63-game bracket using KenPom efficiency metrics, real NCAA NET rankings, committee evaluation metrics (SOR, WAB, KPI, BPI), quantitative models (GARCH volatility, HMM regime detection, Kalman momentum filtering, historical seed priors), Monte Carlo bracket simulation, and seed-constraint optimization.
 
+<!-- ACCURACY_START -->
+<!-- ACCURACY_END -->
+
 ## How It Works
 
 1. **Composite Scoring** -- Each team gets a weighted score from up to 11 normalized (0-100) metrics

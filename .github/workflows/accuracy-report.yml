@@ -32,12 +32,15 @@ jobs:
       - name: Generate accuracy dashboard
         run: python scripts/refresh.py accuracy
 
-      - name: Commit updated dashboard
+      - name: Update README accuracy section
+        run: python scripts/update_readme_accuracy.py
+
+      - name: Commit updated dashboard and README
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add images/accuracy_dashboard.png scraped_data/accuracy_log.json
-          git diff --cached --quiet || git commit -m "chore: update accuracy dashboard"
+          git add images/accuracy_dashboard.png scraped_data/accuracy_log.json README.md
+          git diff --cached --quiet || git commit -m "chore: update accuracy dashboard and README"
           git push
 
       - name: Post accuracy summary to issue
