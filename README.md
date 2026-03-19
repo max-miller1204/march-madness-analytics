@@ -4,9 +4,10 @@ A composite analytical pipeline that predicts NCAA Tournament Final Four teams u
 
 ## How It Works
 
-1. **Composite Scoring** -- Each team gets a weighted score from 9 normalized (0-100) metrics
-2. **Monte Carlo Simulation** -- 10,000 bracket simulations per region using efficiency differentials
-3. **Seed-Constrained Optimization** -- Brute-force search for the highest-scoring Final Four with seed sum >= 15
+1. **Composite Scoring** -- Each team gets a weighted score from up to 10 normalized (0-100) metrics
+2. **Injury Adjustment** -- Real-time injury data adjusts team NetRtg values using player impact penalties
+3. **Monte Carlo Simulation** -- 10,000 bracket simulations per region using injury-adjusted efficiency differentials
+4. **Seed-Constrained Optimization** -- Brute-force search for the highest-scoring Final Four with seed sum >= 15
 
 ## Data Sources
 
@@ -17,6 +18,9 @@ A composite analytical pipeline that predicts NCAA Tournament Final Four teams u
 | Team sheet metrics (SOR, WAB, KPI, BPI) | `scraped_data/tournament_teams.csv` | [warrennolan.com](https://www.warrennolan.com/basketball/2026/net-teamsheets-plus) |
 | Game-by-game results | `scraped_data/tournament_games.csv` | [warrennolan.com](https://www.warrennolan.com/basketball/2026/net-teamsheets-plus) |
 | Tournament bracket | `bracket.csv` | Manual entry |
+| Injury reports | `scraped_data/injuries.csv` | [boydsbets.com](https://www.boydsbets.com/college-basketball-injuries/) |
+| Player stats (MPG, PPG) | `scraped_data/player_stats.csv` | [espn.com](https://www.espn.com/mens-college-basketball/) |
+| Injury adjustments | `scraped_data/injury_adjustments.csv` | Computed from injuries + player stats + KenPom |
 
 ## Quickstart
 
@@ -25,34 +29,55 @@ pip install -r requirements.txt
 jupyter notebook final_four_analysis.ipynb
 ```
 
-To refresh scraped data from Warren Nolan:
+## Refreshing Data
+
+**Warren Nolan team sheets:**
 
 ```bash
-python scrape_net_teamsheets.py
-python filter_tournament_teams.py
+python scripts/scrape_net_teamsheets.py
+python scripts/filter_tournament_teams.py
 ```
+
+**Injury data (full pipeline):**
+
+```bash
+# Step 1: Scrape injury reports (boydsbets.com -- not in sandbox allowlist)
+python scripts/scrape_injuries.py --refresh
+
+# Step 2: Scrape player stats from ESPN + compute injury adjustments
+# Takes ~1 min (68 teams, ~0.7s courtesy delay between requests)
+python scripts/scrape_player_stats.py --refresh
+
+# Step 3: Re-run the notebook with injury-adjusted data
+jupyter nbconvert --execute final_four_analysis.ipynb --to notebook
+```
+
+Both scrapers cache results for 6 hours. Use `--refresh` to force re-scrape.
+
+**Without injury data:** The notebook gracefully degrades -- it runs the original 9-feature model with unadjusted NetRtg values. No scrapers required.
 
 ## Composite Model Weights
 
-The full scheme uses 9 independent features (no KenPom/NET double-counting):
+With injury data, the full scheme uses 10 features. Without injuries, it falls back to 9 features with redistributed weights.
 
-| Metric | Weight | Source |
-|--------|--------|--------|
-| KenPom Net Rating | 0.20 | kenpom.csv |
-| KenPom Offensive Rating | 0.10 | kenpom.csv |
-| KenPom Defensive Rating (inv) | 0.10 | kenpom.csv |
-| NCAA NET Rank (inv) | 0.15 | ncaa-net-rankings.csv |
-| Strength of Record (inv) | 0.10 | tournament_teams.csv |
-| Wins Above Bubble | 0.10 | tournament_teams.csv |
-| NET Strength of Schedule (inv) | 0.05 | tournament_teams.csv |
-| Q1 Win % | 0.10 | ncaa-net-rankings.csv |
-| Q1+Q2 Win % | 0.10 | ncaa-net-rankings.csv |
+| Metric | W/ Injuries | W/o Injuries | Source |
+|--------|:-----------:|:------------:|--------|
+| KenPom Net Rating | 0.175 | 0.20 | kenpom.csv |
+| KenPom Offensive Rating | 0.10 | 0.10 | kenpom.csv |
+| KenPom Defensive Rating (inv) | 0.10 | 0.10 | kenpom.csv |
+| NCAA NET Rank (inv) | 0.125 | 0.15 | ncaa-net-rankings.csv |
+| Strength of Record (inv) | 0.10 | 0.10 | tournament_teams.csv |
+| Wins Above Bubble | 0.10 | 0.10 | tournament_teams.csv |
+| NET Strength of Schedule (inv) | 0.05 | 0.05 | tournament_teams.csv |
+| Q1 Win % | 0.10 | 0.10 | ncaa-net-rankings.csv |
+| Q1+Q2 Win % | 0.10 | 0.10 | ncaa-net-rankings.csv |
+| **Injury Health** | **0.05** | -- | injury_adjustments.csv |
 
-Fallback weight schemes activate when team sheet or quad data is unavailable.
+Additional fallback weight schemes activate when team sheet or quad data is unavailable.
 
 ## Monte Carlo Simulation
 
-Win probability uses a logistic function on KenPom net efficiency differentials:
+Win probability uses a logistic function on **injury-adjusted** net efficiency differentials:
 
 ```
 P(A wins) = 1 / (1 + 10^(-(NetRtg_A - NetRtg_B) / 22))
@@ -125,18 +150,22 @@ Each region is simulated 10,000 times (R64 -> R32 -> Sweet 16 -> Elite 8) to pro
 ## Project Structure
 
 ```
-final_four_analysis.ipynb       # Main notebook (run all cells)
-requirements.txt                # Python dependencies
+final_four_analysis.ipynb         # Main notebook (run all cells)
+requirements.txt                  # Python dependencies
 scripts/
   scrape_net_teamsheets.py        # Scrapes Warren Nolan team sheets
   filter_tournament_teams.py      # Filters scraped data to tournament teams
+  scrape_injuries.py              # Scrapes injury reports from boydsbets.com
+  scrape_player_stats.py          # Scrapes player stats, computes injury adjustments
 scraped_data/
-  tournament_teams.csv          # Team-level metrics (68 teams)
-  tournament_games.csv          # Game-by-game results (~2200 games)
-  quad_records.csv              # Q1/Q2 win-loss records
+  tournament_teams.csv            # Team-level metrics (68 teams)
+  tournament_games.csv            # Game-by-game results (~2200 games)
   ncaa-net-rankings.csv           # NCAA NET rankings (365 D1 teams)
   kenpom.csv                      # KenPom efficiency data (68 tournament teams)
   bracket.csv                     # Tournament bracket (32 first-round games)
+  injuries.csv                    # Injury reports (tournament teams only)
+  player_stats.csv                # Per-player MPG/PPG for tournament teams
+  injury_adjustments.csv          # Injury penalties + adjusted NetRtg per team
 ```
 
 ## Key Metrics Glossary

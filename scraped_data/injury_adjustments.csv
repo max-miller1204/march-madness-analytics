@@ -1,0 +1,69 @@
+team,num_injuries,total_penalty,adjusted_NetRtg,injury_health_raw,key_injuries_summary
+Akron,0,0.0,12.77,0.0,
+Alabama,3,-0.051,25.649,-0.051,"Collins Onyejiaka (Out, -0.01); Davion Hannah (Questionable, -0.02); Keitenn Bristow (Questionable, -0.02)"
+Arizona,0,0.0,37.62,0.0,
+Arkansas,1,-0.115,25.925,-0.115,"Karter Knox (Questionable, -0.12)"
+BYU,4,-1.796,21.414,-1.796,"Nate Pickens (Out, -0.08); Dawson Baker (Out, -0.37); Xavion Staton (Questionable, -0.00); Richie Saunders (Out, -1.42)"
+Cal Baptist,0,0.0,6.0,0.0,
+Clemson,3,-0.539,18.691,-0.539,"Carter Welling (Questionable, -0.16); Zac Foster (Out, -0.40); Trent Steinour (Questionable, -0.00)"
+Duke,3,-0.928,37.972,-0.928,"Ifeanyi Ufochukwu (Out, -0.01); Patrick Ngongba Ii (Doubtful, -0.35); Caleb Foster (Out, -0.63)"
+Florida,0,0.0,33.78,0.0,
+Furman,0,0.0,-1.98,0.0,
+Georgia,0,0.0,20.47,0.0,
+Gonzaga,1,-1.122,26.978,-1.122,"Braden Huff (Out, -1.12)"
+Hawaii,0,0.0,5.98,0.0,
+High Point,0,0.0,8.4,0.0,
+Hofstra,0,0.0,9.53,0.0,
+Houston,1,-0.015,33.375,-0.015,"Kordel Jefferson (Out, -0.02)"
+Howard,1,-0.001,-2.921,-0.001,"Shane Frazier (Questionable, -0.00)"
+Idaho,0,0.0,1.55,0.0,
+Illinois,2,-0.036,32.054,-0.036,"Jason Jakstys (Out, -0.02); Ty Rodgers (Questionable, -0.02)"
+Iowa,1,-0.094,22.336,-0.094,"Peyton Mccollum (Out, -0.09)"
+Iowa State,2,-0.089,32.291,-0.089,"Mason Williams (Out, -0.09); Xzavion Mitchell (Questionable, -0.00)"
+Kansas,3,-0.022,24.388,-0.022,"Will Thengvall (Questionable, -0.00); Corbin Allen (Questionable, -0.02); Justin Cross (Questionable, -0.00)"
+Kennesaw State,3,-0.183,0.577,-0.183,"Davin Cosby (Out, -0.07); Chase Clemmons (Out, -0.07); Brendan Tousignaut (Out, -0.07)"
+Kentucky,2,-0.475,21.005,-0.475,"Jaland Lowe (Out, -0.38); Jayden Quaintance (Doubtful, -0.11)"
+Lehigh,2,-0.171,-10.581,-0.171,"Caesar Burrows (Out, -0.09); Bube Momah (Out, -0.09)"
+Long Island University,0,0.0,-3.96,0.0,
+Louisville,1,-0.078,25.342,-0.078,"Mikel Brown Jr (Out, -0.08)"
+McNeese,0,0.0,12.48,0.0,
+Miami (FL),2,-0.435,20.245,-0.435,"Marcus Allen (Out, -0.42); Treyvon Maddox (Questionable, -0.02)"
+Miami (OH),3,-0.985,7.265,-0.985,"Evan Ipsaro (Out, -0.88); Leshawn Stowers (Out, -0.07); Blake Anderson (Out, -0.07)"
+Michigan,2,-0.425,37.155,-0.425,"Winters Grady (Questionable, -0.01); L J Cason (Out, -0.42)"
+Michigan State,2,-0.326,27.974,-0.326,"Kaleb Glenn (Out, -0.09); Divine Ugochukwu (Out, -0.25)"
+Missouri,4,-0.164,15.226,-0.164,"Amar Kuljuhovic (Questionable, -0.02); Antwan Burnett (Questionable, -0.02); Annor Boateng (Out, -0.08); Jevon Porter (Questionable, -0.07)"
+NC State,0,0.0,19.62,0.0,
+Nebraska,3,-0.266,25.884,-0.266,"Henry Burt (Questionable, -0.02); Connor Essegian (Out, -0.21); Ugnius Jarusevicius (Questionable, -0.05)"
+North Carolina,3,-1.655,19.175,-1.655,"Ivan Matlekovic (Questionable, -0.00); James Brown (Out, -0.02); Caleb Wilson (Out, -1.64)"
+North Dakota State,0,0.0,5.16,0.0,
+Northern Iowa,3,-0.029,11.791,-0.029,"Chase Courbat (Questionable, -0.00); Cade Courbat (Questionable, -0.00); Marino Dubravcic (Questionable, -0.03)"
+Ohio State,2,-0.059,22.171,-0.059,"Josh Ojianwuna (Questionable, -0.02); Taison Chatman (Questionable, -0.04)"
+Penn,5,-1.887,-0.557,-1.887,"Ethan Roberts (Out, -1.45); Dylan Williams (Questionable, -0.01); Ryan Altman (Questionable, -0.02); Tj Power (Probable, -0.42); Tibor Mirtic (Out, -0.08)"
+Prairie View A&M,2,-0.259,-10.949,-0.259,"Ryan Bolton Jr (Out, -0.07); Marcel Bryant (Out, -0.20)"
+Purdue,0,0.0,31.19,0.0,
+Queens (NC),0,0.0,-1.43,0.0,
+SMU,1,-1.174,16.906,-1.174,"B J Edwards (Out, -1.17)"
+Saint Louis,0,0.0,18.26,0.0,
+Saint Mary's,0,0.0,23.08,0.0,
+Santa Clara,0,0.0,19.4,0.0,
+Siena,4,-0.744,-2.884,-0.744,"Tasman Goodrick (Out, -0.67); Owen Schlager (Questionable, -0.02); Reid Ducharme (Questionable, -0.02); Tajae Jones (Questionable, -0.06)"
+South Florida,2,-0.836,15.544,-0.836,"Xavier Brown (Out, -0.77); De Ante Green (Out, -0.08)"
+St. John's,0,0.0,25.89,0.0,
+TCU,1,0.0,17.53,0.0,"Malick Diallo (Out, -0.00)"
+Tennessee,1,-0.182,25.838,-0.182,"Cade Phillips (Out, -0.18)"
+Tennessee State,0,0.0,-1.81,0.0,
+Texas,1,-0.037,18.983,-0.037,"Lassina Traore (Questionable, -0.04)"
+Texas A&M,1,-0.489,18.161,-0.489,"Mackenzie Mgbako (Out, -0.49)"
+Texas Tech,1,-2.024,23.176,-2.024,"Jt Toppin (Out, -2.02)"
+Troy,0,0.0,1.73,0.0,
+UCF,1,-0.022,14.978,-0.022,"Tanner Jones (Questionable, -0.02)"
+UCLA,2,-0.41,21.25,-0.41,"Evan Manjikian (Questionable, -0.02); Tyler Bilodeau (Questionable, -0.39)"
+UConn,1,-0.059,27.791,-0.059,"Jaylin Stewart (Questionable, -0.06)"
+UMBC,0,0.0,-1.95,0.0,
+Utah State,0,0.0,20.78,0.0,
+VCU,1,-0.021,17.109,-0.021,"Obinnaya Okafor (Questionable, -0.02)"
+Vanderbilt,1,-0.076,27.424,-0.076,"George Kimble III (Out, -0.08)"
+Villanova,1,-0.756,19.184,-0.756,"Matthew Hodge (Out, -0.76)"
+Virginia,3,-0.124,26.586,-0.124,"Amani Hansberry (Questionable, -0.02); Shamarius Peterkin (Questionable, -0.02); Sin Cere Jones (Out, -0.09)"
+Wisconsin,2,-0.309,23.071,-0.309,"Jack Janicki (Questionable, -0.03); Nolan Winter (Questionable, -0.29)"
+Wright State,0,0.0,2.04,0.0,

@@ -1,0 +1,89 @@
+player,team,position,injury_type,status,date_reported,status_weight
+Collins Onyejiaka,Alabama,C,Undisclosed,Out,"Sun, Dec 28",1.0
+Davion Hannah,Alabama,G,Undisclosed,Questionable,"Sun, Dec 28",0.25
+Keitenn Bristow,Alabama,F,Undisclosed,Questionable,"Mon, Jan 12",0.25
+Karter Knox,Arkansas,F,Undisclosed,Questionable,"Mon, Feb 16",0.25
+Nate Pickens,BYU,G,Undisclosed,Out,"Fri, Nov 7",1.0
+Dawson Baker,BYU,G,Knee,Out,"Sun, Nov 30",1.0
+Xavion Staton,BYU,C,Undisclosed,Questionable,"Mon, Jan 12",0.25
+Richie Saunders,BYU,G,Knee,Out,"Sat, Feb 14",1.0
+Carter Welling,Clemson,F,Knee,Questionable,"Tue, Mar 10",0.25
+Zac Foster,Clemson,G,Knee,Out,"Mon, Dec 15",1.0
+Trent Steinour,Clemson,F,Undisclosed,Questionable,"Thu, Feb 19",0.25
+Ifeanyi Ufochukwu,Duke,C,Undisclosed,Out,"Mon, Dec 29",1.0
+Patrick Ngongba Ii,Duke,C,Foot,Doubtful,"Thu, Mar 5",0.5
+Caleb Foster,Duke,G,Foot,Out,"Mon, Mar 9",1.0
+Braden Huff,Gonzaga,F,Knee,Out,"Wed, Jan 14",1.0
+Kordel Jefferson,Houston,G,Knee,Out,"Fri, Jan 2",1.0
+Shane Frazier,Howard,G,Undisclosed,Questionable,"Sun, Mar 15",0.25
+Jason Jakstys,Illinois,C,Undisclosed,Out,"Tue, Feb 17",1.0
+Ty Rodgers,Illinois,G,Knee,Questionable,"Sun, Oct 12",0.25
+Peyton Mccollum,Iowa,G,Foot,Out,"Sat, Jan 10",1.0
+Mason Williams,Iowa State,G,Hip,Out,"Thu, Jun 19",1.0
+Xzavion Mitchell,Iowa State,F,Undisclosed,Questionable,"Mon, Jan 5",0.25
+Will Thengvall,Kansas,G,Undisclosed,Questionable,"Wed, Mar 11",0.25
+Corbin Allen,Kansas,G,Undisclosed,Questionable,"Thu, Mar 12",0.25
+Justin Cross,Kansas,F,Undisclosed,Questionable,"Thu, Mar 12",0.25
+Davin Cosby,Kennesaw State,G,Undisclosed,Out,"Sat, Jul 12",1.0
+Chase Clemmons,Kennesaw State,G,Undisclosed,Out,"Tue, Dec 16",1.0
+Brendan Tousignaut,Kennesaw State,G,Undisclosed,Out,"Fri, Jan 16",1.0
+Jaland Lowe,Kentucky,G,Undisclosed,Out,"Mon, Jan 12",1.0
+Jayden Quaintance,Kentucky,F,Knee,Doubtful,"Thu, Jan 8",0.5
+Caesar Burrows,Lehigh,G,Undisclosed,Out,"Tue, Mar 17",1.0
+Bube Momah,Lehigh,F,Undisclosed,Out,"Tue, Mar 17",1.0
+Mikel Brown Jr,Louisville,G,Back,Out,"Thu, Feb 26",1.0
+Marcus Allen,Miami (FL),G,Illness,Out,"Mon, Dec 1",1.0
+Treyvon Maddox,Miami (FL),F,Undisclosed,Questionable,"Sun, Dec 28",0.25
+Evan Ipsaro,Miami (OH),G,Knee,Out,"Sun, Dec 21",1.0
+Leshawn Stowers,Miami (OH),G,Undisclosed,Out,"Tue, Mar 17",1.0
+Blake Anderson,Miami (OH),G,Undisclosed,Out,"Tue, Mar 17",1.0
+Kaleb Glenn,Michigan State,F,Knee,Out,"Tue, Jun 17",1.0
+Divine Ugochukwu,Michigan State,G,Foot,Out,"Wed, Feb 4",1.0
+Winters Grady,Michigan,G,Undisclosed,Questionable,"Thu, Jan 22",0.25
+L J Cason,Michigan,G,Knee,Out,"Fri, Feb 27",1.0
+Amar Kuljuhovic,Missouri,G,Undisclosed,Questionable,"Wed, Feb 11",0.25
+Antwan Burnett,Missouri,G,Undisclosed,Questionable,"Mon, Mar 9",0.25
+Annor Boateng,Missouri,G,Leg,Out,"Fri, Jan 30",1.0
+Jevon Porter,Missouri,F,Lower Leg,Questionable,"Sun, Dec 21",0.25
+Henry Burt,Nebraska,F,Undisclosed,Questionable,"Sun, Nov 2",0.25
+Connor Essegian,Nebraska,G,Ankle,Out,"Fri, Nov 28",1.0
+Ugnius Jarusevicius,Nebraska,F,Undisclosed,Questionable,"Fri, Jan 9",0.25
+Ivan Matlekovic,North Carolina,C,Hand,Questionable,"Thu, Jan 15",0.25
+James Brown,North Carolina,C,Foot,Out,"Mon, Jan 19",1.0
+Caleb Wilson,North Carolina,F,Thumb,Out,"Tue, Feb 10",1.0
+Chase Courbat,Northern Iowa,F,Undisclosed,Questionable,"Tue, Feb 24",0.25
+Cade Courbat,Northern Iowa,G,Undisclosed,Questionable,"Tue, Jan 6",0.25
+Marino Dubravcic,Northern Iowa,F,Undisclosed,Questionable,"Tue, Jan 6",0.25
+Josh Ojianwuna,Ohio State,F,Knee,Questionable,"Mon, Oct 27",0.25
+Taison Chatman,Ohio State,G,Undisclosed,Questionable,"Thu, Mar 12",0.25
+Ethan Roberts,Penn,G,Concussion,Out,"Thu, Mar 12",1.0
+Dylan Williams,Penn,G,Undisclosed,Questionable,"Sun, Jan 4",0.25
+Ryan Altman,Penn,G,Undisclosed,Questionable,"Sun, Jan 4",0.25
+Tj Power,Penn,F,Illness,Probable,"Tue, Mar 17",0.25
+Tibor Mirtic,Penn,F,Leg,Out,"Mon, Jan 5",1.0
+Ryan Bolton Jr,Prairie View A&M,C,Undisclosed,Out,"Mon, Mar 16",1.0
+Marcel Bryant,Prairie View A&M,F,Undisclosed,Out,"Mon, Mar 16",1.0
+B J Edwards,SMU,G,Ankle,Out,"Wed, Feb 25",1.0
+Tasman Goodrick,Siena,F,Knee,Out,"Thu, Jan 1",1.0
+Owen Schlager,Siena,G,Upper Body,Questionable,"Thu, Dec 4",0.25
+Reid Ducharme,Siena,G,Shoulder,Questionable,"Sun, Nov 2",0.25
+Tajae Jones,Siena,F,Back,Questionable,"Sat, Jan 3",0.25
+Xavier Brown,South Florida,G,Undisclosed,Out,"Sat, Jan 3",1.0
+De Ante Green,South Florida,F,Achilles,Out,"Sat, Jan 3",1.0
+Malick Diallo,TCU,C,Knee,Out,"Mon, Nov 3",1.0
+Cade Phillips,Tennessee,F,Shoulder,Out,"Sun, Dec 7",1.0
+Mackenzie Mgbako,Texas A&M,F,Foot,Out,"Sun, Dec 28",1.0
+Lassina Traore,Texas,F,Undisclosed,Questionable,"Thu, Feb 12",0.25
+Jt Toppin,Texas Tech,F,Knee,Out,"Tue, Feb 17",1.0
+Tanner Jones,UCF,G,Undisclosed,Questionable,"Thu, Jan 1",0.25
+Evan Manjikian,UCLA,F,Undisclosed,Questionable,"Fri, Jan 16",0.25
+Tyler Bilodeau,UCLA,F,Knee,Questionable,"Thu, Mar 12",0.25
+Jaylin Stewart,UConn,F,Knee,Questionable,"Tue, Feb 24",0.25
+Obinnaya Okafor,VCU,F,Undisclosed,Questionable,"Tue, Feb 10",0.25
+George Kimble III,Vanderbilt,G,Knee,Out,"Wed, Jun 4",1.0
+Matthew Hodge,Villanova,F,Knee,Out,"Fri, Feb 27",1.0
+Amani Hansberry,Virginia,F,Undisclosed,Questionable,"Sun, Mar 8",0.25
+Shamarius Peterkin,Virginia,G,Undisclosed,Questionable,"Mon, Feb 9",0.25
+Sin Cere Jones,Virginia,F,Foot,Out,"Mon, Feb 9",1.0
+Jack Janicki,Wisconsin,G,Wrist,Questionable,"Tue, Feb 24",0.25
+Nolan Winter,Wisconsin,F,Lower Body,Questionable,"Wed, Mar 4",0.25

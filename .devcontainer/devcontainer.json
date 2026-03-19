@@ -7,15 +7,19 @@
   "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
   "workspaceFolder": "/workspace",
   "mounts": [
-    "source=${localEnv:HOME}/.claude,target=/root/.claude,type=bind,consistency=cached",
-    "source=${localEnv:HOME}/.claude.json,target=/root/.claude.json,type=bind,consistency=cached"
+    "source=${localEnv:HOME}/.claude,target=/tmp/claude-host,type=bind,readonly",
+    "source=${localEnv:HOME}/.claude.json,target=/tmp/claude-host.json,type=bind,readonly"
   ],
-  "postCreateCommand": "curl -fsSL https://claude.ai/install.sh | bash",
+  "containerEnv": {
+    "HOST_HOME": "${localEnv:HOME}"
+  },
+  "postCreateCommand": "cp -r /tmp/claude-host /root/.claude && cp /tmp/claude-host.json /root/.claude.json && find /root/.claude -type f -name '*.json' -exec sed -i \"s|$HOST_HOME/.claude|/root/.claude|g; s|$HOST_HOME|/workspace|g\" {} + && curl -fsSL https://claude.ai/install.sh | bash",
   "customizations": {
     "vscode": {
       "extensions": [
         "ms-toolsai.jupyter",
-        "ms-python.python"
+        "ms-python.python",
+        "tomoki1207.pdf"
       ]
     }
   }

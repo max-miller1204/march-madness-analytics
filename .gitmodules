@@ -1,0 +1,3 @@
+[submodule "Quant-Guild-Library"]
+	path = Quant-Guild-Library
+	url = https://github.com/romanmichaelpaolucci/Quant-Guild-Library.git
