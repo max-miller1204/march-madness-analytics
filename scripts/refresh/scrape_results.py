@@ -448,19 +448,37 @@ def _parse_from_html(soup, bracket_teams, bracket_games, seen_ids):
         game_cards = soup.find_all("div", class_=re.compile(r"scoreboard", re.I))
 
     for card in game_cards:
-        # Check if game is final
+        card_text = card.get_text(" ", strip=True).lower()
+
+        # Check if game is final — try explicit "Final" text first
         status_el = card.find(string=re.compile(r"Final", re.I)) or card.find(
             class_=re.compile(r"status", re.I)
         )
-        if not status_el:
-            continue
-        status_text = (
-            status_el.get_text(strip=True)
-            if hasattr(status_el, "get_text")
-            else str(status_el)
+        if status_el:
+            status_text = (
+                status_el.get_text(strip=True)
+                if hasattr(status_el, "get_text")
+                else str(status_el)
+            )
+        else:
+            status_text = ""
+
+        # ESPN often renders "Final" client-side. If both teams have scores
+        # and there are no live-game indicators, treat as completed.
+        is_live = any(
+            kw in card_text
+            for kw in ["halftime", "half", "in progress", "delayed", "postponed"]
         )
+        scores = card.select("div.ScoreCell__Score")
+        has_both_scores = len(scores) >= 2 and all(
+            s.get_text(strip=True).isdigit() and int(s.get_text(strip=True)) > 0
+            for s in scores[:2]
+        )
+
         if "final" not in status_text.lower():
-            continue
+            # Fall back: completed if scores present and not live
+            if not (has_both_scores and not is_live):
+                continue
 
         # Extract team names and scores from competitor rows
         team_rows = card.select("li.ScoreboardScoreCell__Item") or card.select("tr")
@@ -511,6 +529,25 @@ def _parse_from_html(soup, bracket_teams, bracket_games, seen_ids):
         if score_a <= 0 or score_b <= 0:
             continue
 
+        # Look up seeds from bracket.csv if ESPN didn't provide them
+        seed_a = t1["seed"]
+        seed_b = t2["seed"]
+        if seed_a == 0 or seed_b == 0:
+            for row in bracket_games:
+                for col, seed_col in (("TeamA", "SeedA"), ("TeamB", "SeedB")):
+                    raw = row[col].strip()
+                    expanded = PLAYIN_TEAMS.get(raw, [raw])
+                    if name_a in expanded and seed_a == 0:
+                        try:
+                            seed_a = int(row.get(seed_col, 0))
+                        except (ValueError, TypeError):
+                            pass
+                    if name_b in expanded and seed_b == 0:
+                        try:
+                            seed_b = int(row.get(seed_col, 0))
+                        except (ValueError, TypeError):
+                            pass
+
         winner = name_a if score_a > score_b else name_b
         game_id = _find_game_id(name_a, name_b, bracket_games, seen_ids)
         if game_id in seen_ids:
@@ -535,9 +572,9 @@ def _parse_from_html(soup, bracket_teams, bracket_games, seen_ids):
                 "game_id": game_id,
                 "round": game_round,
                 "region": region,
-                "seed_a": t1["seed"],
+                "seed_a": seed_a,
                 "team_a": name_a,
-                "seed_b": t2["seed"],
+                "seed_b": seed_b,
                 "team_b": name_b,
                 "score_a": score_a,
                 "score_b": score_b,

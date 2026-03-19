@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-03-19T21:15:35.536685+00:00",
+  "last_updated": "2026-03-19T21:20:03.241651+00:00",
   "current_round": "Round of 64",
   "completed_games": [
     {
@@ -15,16 +15,187 @@
       "winner": "Howard",
       "margin": 3,
       "completed_at": "2026-03-19T21:10:14.607444+00:00"
+    },
+    {
+      "game_id": "S3",
+      "round": "Round of 64",
+      "region": "South",
+      "seed_a": 12,
+      "team_a": "McNeese",
+      "seed_b": 5,
+      "team_b": "Vanderbilt",
+      "score_a": 63,
+      "score_b": 72,
+      "winner": "Vanderbilt",
+      "margin": 9,
+      "completed_at": "2026-03-19T21:20:03.241610+00:00"
+    },
+    {
+      "game_id": "E1",
+      "round": "Round of 64",
+      "region": "East",
+      "seed_a": 16,
+      "team_a": "Siena",
+      "seed_b": 1,
+      "team_b": "Duke",
+      "score_a": 65,
+      "score_b": 71,
+      "winner": "Duke",
+      "margin": 6,
+      "completed_at": "2026-03-19T21:20:03.241630+00:00"
+    },
+    {
+      "game_id": "S4",
+      "round": "Round of 64",
+      "region": "South",
+      "seed_a": 13,
+      "team_a": "Troy",
+      "seed_b": 4,
+      "team_b": "Nebraska",
+      "score_a": 47,
+      "score_b": 76,
+      "winner": "Nebraska",
+      "margin": 29,
+      "completed_at": "2026-03-19T21:20:03.241633+00:00"
+    },
+    {
+      "game_id": "W3",
+      "round": "Round of 64",
+      "region": "West",
+      "seed_a": 12,
+      "team_a": "High Point",
+      "seed_b": 5,
+      "team_b": "Wisconsin",
+      "score_a": 83,
+      "score_b": 82,
+      "winner": "High Point",
+      "margin": 1,
+      "completed_at": "2026-03-19T21:20:03.241636+00:00"
+    },
+    {
+      "game_id": "E5",
+      "round": "Round of 64",
+      "region": "East",
+      "seed_a": 11,
+      "team_a": "South Florida",
+      "seed_b": 6,
+      "team_b": "Louisville",
+      "score_a": 79,
+      "score_b": 83,
+      "winner": "Louisville",
+      "margin": 4,
+      "completed_at": "2026-03-19T21:20:03.241639+00:00"
+    },
+    {
+      "game_id": "E2",
+      "round": "Round of 64",
+      "region": "East",
+      "seed_a": 9,
+      "team_a": "TCU",
+      "seed_b": 8,
+      "team_b": "Ohio State",
+      "score_a": 66,
+      "score_b": 64,
+      "winner": "TCU",
+      "margin": 2,
+      "completed_at": "2026-03-19T21:20:03.241641+00:00"
+    },
+    {
+      "game_id": "M5",
+      "round": "Round of 64",
+      "region": "Midwest",
+      "seed_a": 11,
+      "team_a": "Miami (OH)",
+      "seed_b": 11,
+      "team_b": "SMU",
+      "score_a": 89,
+      "score_b": 79,
+      "winner": "Miami (OH)",
+      "margin": 10,
+      "completed_at": "2026-03-19T21:20:03.241643+00:00"
+    },
+    {
+      "game_id": "S1",
+      "round": "Round of 64",
+      "region": "South",
+      "seed_a": 16,
+      "team_a": "Prairie View A&M",
+      "seed_b": 16,
+      "team_b": "Lehigh",
+      "score_a": 67,
+      "score_b": 55,
+      "winner": "Prairie View A&M",
+      "margin": 12,
+      "completed_at": "2026-03-19T21:20:03.241646+00:00"
+    },
+    {
+      "game_id": "W5",
+      "round": "Round of 64",
+      "region": "West",
+      "seed_a": 11,
+      "team_a": "Texas",
+      "seed_b": 11,
+      "team_b": "NC State",
+      "score_a": 68,
+      "score_b": 66,
+      "winner": "Texas",
+      "margin": 2,
+      "completed_at": "2026-03-19T21:20:03.241648+00:00"
     }
   ],
   "predictions_at_time": {},
   "eliminated_teams": [
-    "UMBC"
+    "UMBC",
+    "McNeese",
+    "Siena",
+    "Troy",
+    "Wisconsin",
+    "South Florida",
+    "Ohio State",
+    "SMU",
+    "Lehigh",
+    "NC State"
   ],
   "advancing_teams": {
     "M1": {
       "team": "Howard",
       "seed": 0
+    },
+    "S3": {
+      "team": "Vanderbilt",
+      "seed": 5
+    },
+    "E1": {
+      "team": "Duke",
+      "seed": 1
+    },
+    "S4": {
+      "team": "Nebraska",
+      "seed": 4
+    },
+    "W3": {
+      "team": "High Point",
+      "seed": 12
+    },
+    "E5": {
+      "team": "Louisville",
+      "seed": 6
+    },
+    "E2": {
+      "team": "TCU",
+      "seed": 9
+    },
+    "M5": {
+      "team": "Miami (OH)",
+      "seed": 11
+    },
+    "S1": {
+      "team": "Prairie View A&M",
+      "seed": 16
+    },
+    "W5": {
+      "team": "Texas",
+      "seed": 11
     }
   }
 }
