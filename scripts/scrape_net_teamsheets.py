@@ -66,7 +66,11 @@ def scrape_teamsheets():
                 centers = section.select("div.ts-data-center")
                 for r, c in zip(rights, centers):
                     label = r.get_text("\n", strip=True)
-                    vals = [l.strip() for l in c.get_text("\n", strip=True).split("\n") if l.strip()]
+                    vals = [
+                        l.strip()
+                        for l in c.get_text("\n", strip=True).split("\n")
+                        if l.strip()
+                    ]
                     if "NET SOS" in label:
                         net_sos = vals[0] if vals else ""
                         net_nonconf_sos = vals[1] if len(vals) > 1 else ""
@@ -93,8 +97,16 @@ def scrape_teamsheets():
             right = hw.select_one("div.ts-data-right")
             left = hw.select_one("div.ts-data-left")
             if right and left:
-                labels = [l.strip().rstrip(":") for l in right.get_text("\n", strip=True).split("\n") if l.strip()]
-                values = [v.strip() for v in left.get_text("\n", strip=True).split("\n") if v.strip()]
+                labels = [
+                    l.strip().rstrip(":")
+                    for l in right.get_text("\n", strip=True).split("\n")
+                    if l.strip()
+                ]
+                values = [
+                    v.strip()
+                    for v in left.get_text("\n", strip=True).split("\n")
+                    if v.strip()
+                ]
                 for lbl, val in zip(labels, values):
                     metrics[lbl] = val
 
@@ -107,7 +119,11 @@ def scrape_teamsheets():
                 title_el = c.select_one("div.ts-wide-title")
                 if title_el:
                     q_name = title_el.get_text(strip=True).replace("QUADRANT ", "Q")
-                    vals = [l.strip() for l in c.get_text("\n", strip=True).split("\n") if l.strip() and l.strip() != title_el.get_text(strip=True)]
+                    vals = [
+                        l.strip()
+                        for l in c.get_text("\n", strip=True).split("\n")
+                        if l.strip() and l.strip() != title_el.get_text(strip=True)
+                    ]
                     # Remove the narrow title duplicate
                     vals = [v for v in vals if v not in ("Q1", "Q2", "Q3", "Q4")]
                     if vals:
@@ -170,33 +186,50 @@ def scrape_teamsheets():
                     opp_net = rank_cell.get_text(strip=True)
                     location = loc_cell.get_text(strip=True) if loc_cell else ""
                     opponent = opp_cell.get_text(strip=True) if opp_cell else ""
-                    is_nonconf = "ts-nitty-nonconf" in (opp_cell.get("class", []) if opp_cell else [])
+                    is_nonconf = "ts-nitty-nonconf" in (
+                        opp_cell.get("class", []) if opp_cell else []
+                    )
 
-                    team_score = score_cells[0].get_text(strip=True) if len(score_cells) > 0 else ""
-                    opp_score = score_cells[1].get_text(strip=True) if len(score_cells) > 1 else ""
-                    is_loss = any("ts-nitty-loss" in (sc.get("class", []) or []) for sc in score_cells)
+                    team_score = (
+                        score_cells[0].get_text(strip=True)
+                        if len(score_cells) > 0
+                        else ""
+                    )
+                    opp_score = (
+                        score_cells[1].get_text(strip=True)
+                        if len(score_cells) > 1
+                        else ""
+                    )
+                    is_loss = any(
+                        "ts-nitty-loss" in (sc.get("class", []) or [])
+                        for sc in score_cells
+                    )
                     result = "L" if is_loss else "W"
 
                     is_ot = False
-                    if date_cell and "ts-nitty-ot" in (date_cell.get("class", []) or []):
+                    if date_cell and "ts-nitty-ot" in (
+                        date_cell.get("class", []) or []
+                    ):
                         is_ot = True
                     date = date_cell.get_text(strip=True) if date_cell else ""
 
-                    games.append({
-                        "team": team_name,
-                        "team_net_rank": rank,
-                        "quadrant": quadrant,
-                        "sub_quadrant": sub_quadrant,
-                        "opp_net_rank": opp_net,
-                        "location": location,
-                        "opponent": opponent,
-                        "is_conference": not is_nonconf,
-                        "team_score": team_score,
-                        "opp_score": opp_score,
-                        "result": result,
-                        "overtime": is_ot,
-                        "date": date,
-                    })
+                    games.append(
+                        {
+                            "team": team_name,
+                            "team_net_rank": rank,
+                            "quadrant": quadrant,
+                            "sub_quadrant": sub_quadrant,
+                            "opp_net_rank": opp_net,
+                            "location": location,
+                            "opponent": opponent,
+                            "is_conference": not is_nonconf,
+                            "team_score": team_score,
+                            "opp_score": opp_score,
+                            "result": result,
+                            "overtime": is_ot,
+                            "date": date,
+                        }
+                    )
 
     return teams, games
 
@@ -215,7 +248,10 @@ def main():
     teams, games = scrape_teamsheets()
 
     if not teams:
-        print("ERROR: No teams scraped. The page structure may have changed.", file=sys.stderr)
+        print(
+            "ERROR: No teams scraped. The page structure may have changed.",
+            file=sys.stderr,
+        )
         sys.exit(1)
 
     print(f"  Scraped {len(teams)} teams and {len(games)} games")

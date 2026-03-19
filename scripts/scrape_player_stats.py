@@ -30,39 +30,49 @@ DECAY = 0.85  # Geometric decay factor
 
 # Bracket name -> ESPN location (only for names that don't match ESPN's location field)
 ESPN_NAME_OVERRIDES = {
-    'Cal Baptist': 'California Baptist',
-    'Hawaii': "Hawai'i",
-    'Miami (FL)': 'Miami',
+    "Cal Baptist": "California Baptist",
+    "Hawaii": "Hawai'i",
+    "Miami (FL)": "Miami",
 }
 
 # Bracket name -> ESPN team ID (for teams not in the 362-team API list)
 ESPN_ID_OVERRIDES = {
-    'Queens (NC)': 2511,
+    "Queens (NC)": 2511,
 }
 
 # KenPom name -> bracket-standard name (for KenPom normalization)
 NAME_ALIASES = {
-    'Michigan St.': 'Michigan State', 'Iowa St.': 'Iowa State',
-    'Ohio St.': 'Ohio State', 'Connecticut': 'UConn',
-    'Utah St.': 'Utah State', 'Miami FL': 'Miami (FL)',
-    'N.C. State': 'NC State', 'North Dakota St.': 'North Dakota State',
-    'Wright St.': 'Wright State', 'Kennesaw St.': 'Kennesaw State',
-    'Miami OH': 'Miami (OH)', 'Tennessee St.': 'Tennessee State',
-    'LIU': 'Long Island University', 'Queens': 'Queens (NC)',
-    'South Fla.': 'South Florida', 'UNI': 'Northern Iowa',
-    'California Baptist': 'Cal Baptist',
-    "Saint Mary's (CA)": "Saint Mary's", "St. John's (NY)": "St. John's",
-    'Long Island': 'Long Island University',
-    "Saint Mary's College": "Saint Mary's", "Saint John's": "St. John's",
-    'North Carolina State': 'NC State',
+    "Michigan St.": "Michigan State",
+    "Iowa St.": "Iowa State",
+    "Ohio St.": "Ohio State",
+    "Connecticut": "UConn",
+    "Utah St.": "Utah State",
+    "Miami FL": "Miami (FL)",
+    "N.C. State": "NC State",
+    "North Dakota St.": "North Dakota State",
+    "Wright St.": "Wright State",
+    "Kennesaw St.": "Kennesaw State",
+    "Miami OH": "Miami (OH)",
+    "Tennessee St.": "Tennessee State",
+    "LIU": "Long Island University",
+    "Queens": "Queens (NC)",
+    "South Fla.": "South Florida",
+    "UNI": "Northern Iowa",
+    "California Baptist": "Cal Baptist",
+    "Saint Mary's (CA)": "Saint Mary's",
+    "St. John's (NY)": "St. John's",
+    "Long Island": "Long Island University",
+    "Saint Mary's College": "Saint Mary's",
+    "Saint John's": "St. John's",
+    "North Carolina State": "NC State",
 }
 
 # Play-in resolutions
 PLAYIN = {
-    'NC State/Texas': ['NC State', 'Texas'],
-    'SMU/Miami (OH)': ['SMU', 'Miami (OH)'],
-    'Howard/UMBC': ['Howard', 'UMBC'],
-    'Lehigh/Prairie View A&M': ['Lehigh', 'Prairie View A&M'],
+    "NC State/Texas": ["NC State", "Texas"],
+    "SMU/Miami (OH)": ["SMU", "Miami (OH)"],
+    "Howard/UMBC": ["Howard", "UMBC"],
+    "Lehigh/Prairie View A&M": ["Lehigh", "Prairie View A&M"],
 }
 
 
@@ -71,7 +81,7 @@ def get_tournament_teams():
     teams = set()
     with open(BRACKET_CSV) as f:
         for row in csv.DictReader(f):
-            for col in ('TeamA', 'TeamB'):
+            for col in ("TeamA", "TeamB"):
                 name = row[col].strip()
                 if name in PLAYIN:
                     for t in PLAYIN[name]:
@@ -101,19 +111,19 @@ def resolve_team_ids(bracket_teams, refresh=False):
     resp = requests.get(url, timeout=30)
     resp.raise_for_status()
     data = resp.json()
-    espn_teams = data['sports'][0]['leagues'][0]['teams']
+    espn_teams = data["sports"][0]["leagues"][0]["teams"]
 
     # Build lookup by ESPN location field -> (id, displayName)
     location_lookup = {}
     for t in espn_teams:
-        team = t['team']
-        location_lookup[team.get('location', '')] = int(team['id'])
+        team = t["team"]
+        location_lookup[team.get("location", "")] = int(team["id"])
 
     # Also build by shortDisplayName for fallback
     short_lookup = {}
     for t in espn_teams:
-        team = t['team']
-        short_lookup[team.get('shortDisplayName', '')] = int(team['id'])
+        team = t["team"]
+        short_lookup[team.get("shortDisplayName", "")] = int(team["id"])
 
     # Resolve each bracket team
     result = {}
@@ -143,7 +153,7 @@ def resolve_team_ids(bracket_teams, refresh=False):
         sys.exit(1)
 
     # Cache the mapping
-    with open(ESPN_TEAM_IDS_CACHE, 'w') as f:
+    with open(ESPN_TEAM_IDS_CACHE, "w") as f:
         json.dump({k: v for k, v in result.items()}, f, indent=2)
     print(f"Resolved {len(result)} teams to ESPN IDs (cached to {ESPN_TEAM_IDS_CACHE})")
 
@@ -157,8 +167,8 @@ def check_ttl():
     try:
         with open(META_FILE) as f:
             meta = json.load(f)
-        ts = datetime.fromisoformat(meta['timestamp'])
-        ttl = meta.get('ttl_hours', TTL_HOURS)
+        ts = datetime.fromisoformat(meta["timestamp"])
+        ttl = meta.get("ttl_hours", TTL_HOURS)
         return datetime.now() - ts < timedelta(hours=ttl)
     except (json.JSONDecodeError, KeyError, ValueError):
         return False
@@ -166,18 +176,32 @@ def check_ttl():
 
 def load_kenpom():
     """Load KenPom data and return dict of team -> NetRtg."""
-    col_names = ['Rk', 'Team', 'Conf', 'W_L', 'NetRtg', 'ORtg', 'DRtg', 'AdjT', 'Luck',
-                 'SOS_NetRtg', 'SOS_ORtg', 'SOS_DRtg', 'NCSOS_NetRtg']
+    col_names = [
+        "Rk",
+        "Team",
+        "Conf",
+        "W_L",
+        "NetRtg",
+        "ORtg",
+        "DRtg",
+        "AdjT",
+        "Luck",
+        "SOS_NetRtg",
+        "SOS_ORtg",
+        "SOS_DRtg",
+        "NCSOS_NetRtg",
+    ]
     import pandas as pd
+
     kp = pd.read_csv(KENPOM_CSV, skiprows=2, header=None, names=col_names)
 
     result = {}
     for _, row in kp.iterrows():
-        m = re.match(r'(.+?)\s+(\d+)$', str(row['Team']))
+        m = re.match(r"(.+?)\s+(\d+)$", str(row["Team"]))
         if m:
             name = m.group(1).strip()
             name = NAME_ALIASES.get(name, name)
-            result[name] = float(row['NetRtg'])
+            result[name] = float(row["NetRtg"])
     return result
 
 
@@ -188,7 +212,7 @@ def load_injuries():
     injuries = {}
     with open(INJURIES_CSV) as f:
         for row in csv.DictReader(f):
-            team = row['team']
+            team = row["team"]
             if team not in injuries:
                 injuries[team] = []
             injuries[team].append(row)
@@ -198,9 +222,9 @@ def load_injuries():
 def team_slug(team_name):
     """Convert a bracket team name to a safe filename slug."""
     slug = team_name.lower()
-    slug = re.sub(r"[.'()&]", '', slug)
-    slug = re.sub(r'[^a-z0-9]+', '-', slug)
-    return slug.strip('-')
+    slug = re.sub(r"[.'()&]", "", slug)
+    slug = re.sub(r"[^a-z0-9]+", "-", slug)
+    return slug.strip("-")
 
 
 def scrape_team_stats(team, espn_id):
@@ -214,7 +238,7 @@ def scrape_team_stats(team, espn_id):
     """
     url = f"https://www.espn.com/mens-college-basketball/team/stats/_/id/{espn_id}"
     headers = {
-        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     }
 
     for attempt in range(4):
@@ -239,8 +263,8 @@ def scrape_team_stats(team, espn_id):
         print(f"    ERROR: All retries exhausted for {team}")
         return None
 
-    soup = BeautifulSoup(resp.text, 'lxml')
-    tables = soup.find_all('table')
+    soup = BeautifulSoup(resp.text, "lxml")
+    tables = soup.find_all("table")
 
     if len(tables) < 2:
         print(f"    ERROR: Expected at least 2 tables for {team}, found {len(tables)}")
@@ -252,8 +276,8 @@ def scrape_team_stats(team, espn_id):
     stats_table = tables[1]
 
     # Parse names and positions from Table 0
-    name_rows = name_table.find_all('tr')
-    stats_rows = stats_table.find_all('tr')
+    name_rows = name_table.find_all("tr")
+    stats_rows = stats_table.find_all("tr")
 
     # First row is header in both tables
     if not name_rows or not stats_rows:
@@ -261,38 +285,45 @@ def scrape_team_stats(team, espn_id):
         return None
 
     # Verify stats header
-    header_cells = stats_rows[0].find_all(['th', 'td'])
+    header_cells = stats_rows[0].find_all(["th", "td"])
     header_labels = [c.get_text(strip=True) for c in header_cells]
     try:
-        min_idx = header_labels.index('MIN')
-        pts_idx = header_labels.index('PTS')
+        min_idx = header_labels.index("MIN")
+        pts_idx = header_labels.index("PTS")
     except ValueError:
-        print(f"    ERROR: Could not find MIN/PTS columns for {team}. Headers: {header_labels}")
+        print(
+            f"    ERROR: Could not find MIN/PTS columns for {team}. Headers: {header_labels}"
+        )
         return None
 
     players = []
     # Skip header row (index 0)
     for i in range(1, min(len(name_rows), len(stats_rows))):
-        name_cell = name_rows[i].find('td')
+        name_cell = name_rows[i].find("td")
         if not name_cell:
             continue
 
         # Get player name from <a> tag
-        link = name_cell.find('a')
+        link = name_cell.find("a")
         if link:
             player_name = link.get_text(strip=True)
         else:
             player_name = name_cell.get_text(strip=True)
 
-        if not player_name or player_name.lower() in ('player', 'team', 'totals', 'total'):
+        if not player_name or player_name.lower() in (
+            "player",
+            "team",
+            "totals",
+            "total",
+        ):
             continue
 
         # Get position from <span class="font10">
-        pos_span = name_cell.find('span', class_='font10')
-        position = pos_span.get_text(strip=True) if pos_span else ''
+        pos_span = name_cell.find("span", class_="font10")
+        position = pos_span.get_text(strip=True) if pos_span else ""
 
         # Get stats from the corresponding row
-        stat_cells = stats_rows[i].find_all(['th', 'td'])
+        stat_cells = stats_rows[i].find_all(["th", "td"])
         stat_values = [c.get_text(strip=True) for c in stat_cells]
 
         try:
@@ -302,13 +333,15 @@ def scrape_team_stats(team, espn_id):
             continue
 
         if mpg > 0:
-            players.append({
-                'team': team,
-                'player': player_name,
-                'position': position,
-                'mpg': round(mpg, 1),
-                'ppg': round(ppg, 1),
-            })
+            players.append(
+                {
+                    "team": team,
+                    "player": player_name,
+                    "position": position,
+                    "mpg": round(mpg, 1),
+                    "ppg": round(ppg, 1),
+                }
+            )
 
     return players
 
@@ -318,7 +351,7 @@ def compute_injury_adjustments(all_player_stats, injuries, kenpom_ratings):
     # Group stats by team
     team_stats = {}
     for p in all_player_stats:
-        team = p['team']
+        team = p["team"]
         if team not in team_stats:
             team_stats[team] = []
         team_stats[team].append(p)
@@ -326,15 +359,15 @@ def compute_injury_adjustments(all_player_stats, injuries, kenpom_ratings):
     # Compute team PPG for each team
     team_ppg = {}
     for team, players in team_stats.items():
-        total_ppg = sum(p['ppg'] for p in players)
+        total_ppg = sum(p["ppg"] for p in players)
         team_ppg[team] = total_ppg if total_ppg > 0 else 1.0
 
     # Add team_ppg to player stats
     for p in all_player_stats:
-        p['team_ppg'] = round(team_ppg.get(p['team'], 1.0), 1)
+        p["team_ppg"] = round(team_ppg.get(p["team"], 1.0), 1)
 
     adjustments = []
-    all_teams = set(p['team'] for p in all_player_stats)
+    all_teams = set(p["team"] for p in all_player_stats)
     # Include teams from kenpom even if we didn't get stats
     all_teams.update(kenpom_ratings.keys())
 
@@ -345,14 +378,16 @@ def compute_injury_adjustments(all_player_stats, injuries, kenpom_ratings):
 
         team_injuries = injuries.get(team, [])
         if not team_injuries:
-            adjustments.append({
-                'team': team,
-                'num_injuries': 0,
-                'total_penalty': 0.0,
-                'adjusted_NetRtg': net_rtg,
-                'injury_health_raw': 0.0,
-                'key_injuries_summary': '',
-            })
+            adjustments.append(
+                {
+                    "team": team,
+                    "num_injuries": 0,
+                    "total_penalty": 0.0,
+                    "adjusted_NetRtg": net_rtg,
+                    "injury_health_raw": 0.0,
+                    "key_injuries_summary": "",
+                }
+            )
             continue
 
         # Match injured players to roster stats
@@ -361,27 +396,27 @@ def compute_injury_adjustments(all_player_stats, injuries, kenpom_ratings):
         tppg = team_ppg.get(team, 1.0)
 
         for inj in team_injuries:
-            inj_name = inj['player'].strip()
-            status_weight = float(inj.get('status_weight', 0.25))
+            inj_name = inj["player"].strip()
+            status_weight = float(inj.get("status_weight", 0.25))
 
             # Find matching player in stats
             matched_player = None
             team_players = team_stats.get(team, [])
             for p in team_players:
                 # Try exact match first, then partial
-                if p['player'].lower() == inj_name.lower():
+                if p["player"].lower() == inj_name.lower():
                     matched_player = p
                     break
                 # Last name match
-                inj_last = inj_name.split()[-1].lower() if inj_name else ''
-                p_last = p['player'].split()[-1].lower() if p['player'] else ''
+                inj_last = inj_name.split()[-1].lower() if inj_name else ""
+                p_last = p["player"].split()[-1].lower() if p["player"] else ""
                 if inj_last and p_last and inj_last == p_last:
                     matched_player = p
                     break
 
             if matched_player:
-                mpg = matched_player['mpg']
-                ppg = matched_player['ppg']
+                mpg = matched_player["mpg"]
+                ppg = matched_player["ppg"]
             else:
                 # Default for unmatched players: assume bench player
                 mpg = 10.0
@@ -390,23 +425,27 @@ def compute_injury_adjustments(all_player_stats, injuries, kenpom_ratings):
             # Penalty formula: (MPG/40) * (PPG/TeamPPG) * SF * status_weight
             penalty = (mpg / 40.0) * (ppg / tppg) * SF * status_weight
             penalties.append(penalty)
-            key_injuries.append(f"{inj_name} ({inj.get('status', '?')}, {penalty:+.2f})")
+            key_injuries.append(
+                f"{inj_name} ({inj.get('status', '?')}, {penalty:+.2f})"
+            )
 
         # Geometric decay: sort by |penalty| desc, apply 0.85^(i-1)
         penalties.sort(key=lambda x: abs(x), reverse=True)
-        decayed_penalties = [p * (DECAY ** i) for i, p in enumerate(penalties)]
+        decayed_penalties = [p * (DECAY**i) for i, p in enumerate(penalties)]
         total_penalty = sum(decayed_penalties)
 
         adjusted_net = net_rtg + total_penalty
 
-        adjustments.append({
-            'team': team,
-            'num_injuries': len(team_injuries),
-            'total_penalty': round(total_penalty, 3),
-            'adjusted_NetRtg': round(adjusted_net, 3),
-            'injury_health_raw': round(total_penalty, 3),
-            'key_injuries_summary': '; '.join(key_injuries),
-        })
+        adjustments.append(
+            {
+                "team": team,
+                "num_injuries": len(team_injuries),
+                "total_penalty": round(total_penalty, 3),
+                "adjusted_NetRtg": round(adjusted_net, 3),
+                "injury_health_raw": round(total_penalty, 3),
+                "key_injuries_summary": "; ".join(key_injuries),
+            }
+        )
 
     return adjustments
 
@@ -414,8 +453,8 @@ def compute_injury_adjustments(all_player_stats, injuries, kenpom_ratings):
 def write_output(all_player_stats, adjustments):
     """Write player stats and injury adjustments CSVs."""
     # Player stats
-    ps_fields = ['team', 'player', 'position', 'mpg', 'ppg', 'team_ppg']
-    with open(PLAYER_STATS_CSV, 'w', newline='') as f:
+    ps_fields = ["team", "player", "position", "mpg", "ppg", "team_ppg"]
+    with open(PLAYER_STATS_CSV, "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=ps_fields)
         writer.writeheader()
         for p in all_player_stats:
@@ -423,26 +462,38 @@ def write_output(all_player_stats, adjustments):
     print(f"  Wrote {len(all_player_stats)} player records to {PLAYER_STATS_CSV}")
 
     # Injury adjustments
-    adj_fields = ['team', 'num_injuries', 'total_penalty', 'adjusted_NetRtg',
-                  'injury_health_raw', 'key_injuries_summary']
-    with open(INJURY_ADJ_CSV, 'w', newline='') as f:
+    adj_fields = [
+        "team",
+        "num_injuries",
+        "total_penalty",
+        "adjusted_NetRtg",
+        "injury_health_raw",
+        "key_injuries_summary",
+    ]
+    with open(INJURY_ADJ_CSV, "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=adj_fields)
         writer.writeheader()
         writer.writerows(adjustments)
     print(f"  Wrote {len(adjustments)} team adjustments to {INJURY_ADJ_CSV}")
 
     # Meta file
-    with open(META_FILE, 'w') as f:
-        json.dump({'timestamp': datetime.now().isoformat(), 'ttl_hours': TTL_HOURS}, f)
+    with open(META_FILE, "w") as f:
+        json.dump({"timestamp": datetime.now().isoformat(), "ttl_hours": TTL_HOURS}, f)
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Scrape player stats from ESPN and compute injury adjustments')
-    parser.add_argument('--refresh', action='store_true', help='Force re-scrape ignoring TTL cache')
+    parser = argparse.ArgumentParser(
+        description="Scrape player stats from ESPN and compute injury adjustments"
+    )
+    parser.add_argument(
+        "--refresh", action="store_true", help="Force re-scrape ignoring TTL cache"
+    )
     args = parser.parse_args()
 
     if not args.refresh and check_ttl():
-        print(f"Cached data is fresh (TTL: {TTL_HOURS}h). Use --refresh to force update.")
+        print(
+            f"Cached data is fresh (TTL: {TTL_HOURS}h). Use --refresh to force update."
+        )
         return
 
     os.makedirs(OUTPUT_DIR, exist_ok=True)
@@ -450,7 +501,7 @@ def main():
     # Delete old sports-reference cache if it exists (one-time migration)
     if os.path.exists(CACHE_DIR):
         # Check if cache contains old sports-reference JSON files
-        old_files = [f for f in os.listdir(CACHE_DIR) if f.endswith('.json')]
+        old_files = [f for f in os.listdir(CACHE_DIR) if f.endswith(".json")]
         if old_files:
             # Peek at first file to see if it's sports-reference format
             sample = os.path.join(CACHE_DIR, old_files[0])
@@ -458,7 +509,7 @@ def main():
                 with open(sample) as f:
                     data = json.load(f)
                 # Old format won't have espn-sourced data marker
-                if data and isinstance(data, list) and data[0].get('source') != 'espn':
+                if data and isinstance(data, list) and data[0].get("source") != "espn":
                     print(f"Clearing old cache ({len(old_files)} files)...")
                     shutil.rmtree(CACHE_DIR)
             except (json.JSONDecodeError, KeyError, IndexError):
@@ -494,13 +545,13 @@ def main():
         if not args.refresh and os.path.exists(cache_file):
             with open(cache_file) as cf:
                 players = json.load(cf)
-            print(f"[{i+1}/{len(teams)}] {team} (cached, {len(players)} players)")
+            print(f"[{i + 1}/{len(teams)}] {team} (cached, {len(players)} players)")
             all_player_stats.extend(players)
             cached_count += 1
             continue
 
         espn_id = team_ids[team]
-        print(f"[{i+1}/{len(teams)}] Scraping {team} (ESPN ID {espn_id})...")
+        print(f"[{i + 1}/{len(teams)}] Scraping {team} (ESPN ID {espn_id})...")
         players = scrape_team_stats(team, espn_id)
 
         if players is None or len(players) == 0:
@@ -510,13 +561,13 @@ def main():
 
         # Mark as ESPN-sourced for cache migration detection
         for p in players:
-            p['source'] = 'espn'
+            p["source"] = "espn"
 
         all_player_stats.extend(players)
         print(f"    Found {len(players)} players")
 
         # Save to per-team cache
-        with open(cache_file, 'w') as cf:
+        with open(cache_file, "w") as cf:
             json.dump(players, cf)
 
         # Courtesy delay
@@ -535,21 +586,25 @@ def main():
     adjustments = compute_injury_adjustments(all_player_stats, injuries, kenpom_ratings)
 
     # Verify all tournament teams have adjustments
-    adjustment_teams = {a['team'] for a in adjustments}
+    adjustment_teams = {a["team"] for a in adjustments}
     missing = [t for t in teams if t not in adjustment_teams]
     if missing:
-        print(f"\nERROR: {len(missing)} tournament teams missing from adjustments: {missing}")
+        print(
+            f"\nERROR: {len(missing)} tournament teams missing from adjustments: {missing}"
+        )
         print("These teams may be missing from KenPom data. Check NAME_ALIASES.")
         sys.exit(1)
 
     # Show injury impacts
-    impacted = [a for a in adjustments if a['total_penalty'] != 0]
+    impacted = [a for a in adjustments if a["total_penalty"] != 0]
     if impacted:
         print(f"\nInjury impacts ({len(impacted)} teams):")
-        for a in sorted(impacted, key=lambda x: x['total_penalty']):
-            print(f"  {a['team']}: penalty={a['total_penalty']:+.3f}, "
-                  f"NetRtg {a['adjusted_NetRtg']:.1f} (was {a['adjusted_NetRtg'] - a['total_penalty']:.1f})")
-            if a['key_injuries_summary']:
+        for a in sorted(impacted, key=lambda x: x["total_penalty"]):
+            print(
+                f"  {a['team']}: penalty={a['total_penalty']:+.3f}, "
+                f"NetRtg {a['adjusted_NetRtg']:.1f} (was {a['adjusted_NetRtg'] - a['total_penalty']:.1f})"
+            )
+            if a["key_injuries_summary"]:
                 print(f"    {a['key_injuries_summary']}")
 
     write_output(all_player_stats, adjustments)

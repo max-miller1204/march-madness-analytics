@@ -6,7 +6,6 @@ Diffs previous vs current predictions, generates timestamped markdown reports.
 """
 
 import json
-import os
 from datetime import datetime
 from pathlib import Path
 
@@ -72,7 +71,9 @@ def generate_changelog(
     # --- Section 2: Composite Score Changes ---
     if previous_composites and current_composites:
         changes = []
-        all_teams = set(list(previous_composites.keys()) + list(current_composites.keys()))
+        all_teams = set(
+            list(previous_composites.keys()) + list(current_composites.keys())
+        )
         for team in all_teams:
             prev = previous_composites.get(team)
             curr = current_composites.get(team)
@@ -214,14 +215,16 @@ def main():
         # Extract completed games if available
         raw_games = state.get("completed_games", [])
         for g in raw_games:
-            completed_games.append({
-                "game_id": g.get("game_id", "?"),
-                "result": g.get("result", "N/A"),
-                "predicted_winner": g.get("predicted_winner", "N/A"),
-                "predicted_prob": g.get("predicted_prob", 0.0),
-                "correct": g.get("correct", False),
-                "upset": g.get("upset", False),
-            })
+            completed_games.append(
+                {
+                    "game_id": g.get("game_id", "?"),
+                    "result": g.get("result", "N/A"),
+                    "predicted_winner": g.get("predicted_winner", "N/A"),
+                    "predicted_prob": g.get("predicted_prob", 0.0),
+                    "correct": g.get("correct", False),
+                    "upset": g.get("upset", False),
+                }
+            )
 
     # Try loading accuracy log
     if accuracy_path.exists():

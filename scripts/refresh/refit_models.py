@@ -7,17 +7,14 @@ Outputs updated model objects and adjusted composites.
 """
 
 import json
-import math
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 
 from scripts.quant_models import (
     HierarchicalGARCH,
     KalmanMomentum,
     TeamHMM,
-    _build_team_margins,
     _load_kenpom,
     _resolve_name,
 )
@@ -35,6 +32,7 @@ KENPOM_CSV = DATA_DIR / "kenpom.csv"
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _load_tournament_state(state_path: str) -> dict:
     """Load tournament state JSON. Returns empty dict if file missing."""
@@ -68,26 +66,32 @@ def _completed_games_from_state(state: dict) -> list[dict]:
                 l_score = game.get("loser_score", game.get("opp_score"))
                 date = game.get("date", "03-20")
                 if w_score is not None and l_score is not None:
-                    games.append({
-                        "team": winner,
-                        "opponent": loser,
-                        "date": date,
-                        "team_score": int(w_score),
-                        "opp_score": int(l_score),
-                        "quadrant": "Quadrant 1",
-                    })
-                    games.append({
-                        "team": loser,
-                        "opponent": winner,
-                        "date": date,
-                        "team_score": int(l_score),
-                        "opp_score": int(w_score),
-                        "quadrant": "Quadrant 1",
-                    })
+                    games.append(
+                        {
+                            "team": winner,
+                            "opponent": loser,
+                            "date": date,
+                            "team_score": int(w_score),
+                            "opp_score": int(l_score),
+                            "quadrant": "Quadrant 1",
+                        }
+                    )
+                    games.append(
+                        {
+                            "team": loser,
+                            "opponent": winner,
+                            "date": date,
+                            "team_score": int(l_score),
+                            "opp_score": int(w_score),
+                            "quadrant": "Quadrant 1",
+                        }
+                    )
     return games
 
 
-def _build_tournament_rows(completed_games: list[dict], tournament_weight: float) -> pd.DataFrame:
+def _build_tournament_rows(
+    completed_games: list[dict], tournament_weight: float
+) -> pd.DataFrame:
     """Create a DataFrame of tournament game rows, duplicated by weight.
 
     Each tournament game is duplicated ``round(tournament_weight)`` times so the
@@ -112,7 +116,9 @@ def _build_tournament_rows(completed_games: list[dict], tournament_weight: float
             "opp_net_rank": "",
             "location": "N",
             "is_conference": False,
-            "result": "W" if int(game.get("team_score", 0)) > int(game.get("opp_score", 0)) else "L",
+            "result": "W"
+            if int(game.get("team_score", 0)) > int(game.get("opp_score", 0))
+            else "L",
             "overtime": False,
         }
         for _ in range(n_copies):
@@ -121,7 +127,9 @@ def _build_tournament_rows(completed_games: list[dict], tournament_weight: float
     return pd.DataFrame(rows)
 
 
-def _compute_expected_margins(kenpom_df: pd.DataFrame, completed_games: list[dict]) -> dict:
+def _compute_expected_margins(
+    kenpom_df: pd.DataFrame, completed_games: list[dict]
+) -> dict:
     """Compute expected margin for each tournament game from pre-tournament KenPom.
 
     Returns dict keyed by (team, opponent, date) -> expected_margin.
@@ -179,6 +187,7 @@ def _compute_composite_adjustments(
 # Main entry point
 # ---------------------------------------------------------------------------
 
+
 def refit_models(
     state_path: str = DEFAULT_STATE_PATH,
     tournament_weight: float = 2.0,
@@ -225,8 +234,10 @@ def refit_models(
     tourn_rows = _build_tournament_rows(completed_games, tournament_weight)
     if not tourn_rows.empty:
         augmented_df = pd.concat([games_df, tourn_rows], ignore_index=True)
-        print(f"  Augmented dataset: {len(augmented_df)} rows "
-              f"(+{len(tourn_rows)} tournament copies, weight={tournament_weight})")
+        print(
+            f"  Augmented dataset: {len(augmented_df)} rows "
+            f"(+{len(tourn_rows)} tournament copies, weight={tournament_weight})"
+        )
     else:
         augmented_df = games_df
         print("  No tournament games to append — using base data only")
@@ -236,8 +247,10 @@ def refit_models(
     # ------------------------------------------------------------------
     print("\n[3/5] Re-fitting GARCH...")
     garch = HierarchicalGARCH(augmented_df)
-    print(f"  Alpha={garch.alpha:.4f}, Beta={garch.beta:.4f}, "
-          f"Teams={len(garch.team_sigma)}")
+    print(
+        f"  Alpha={garch.alpha:.4f}, Beta={garch.beta:.4f}, "
+        f"Teams={len(garch.team_sigma)}"
+    )
 
     print("\n[4/5] Re-fitting HMM...")
     hmm = TeamHMM(augmented_df)

@@ -30,7 +30,7 @@ def parse_interval(interval_str: str) -> int:
         return int(interval_str)
 
     total = 0
-    pattern = re.compile(r'(\d+)\s*([hms])', re.IGNORECASE)
+    pattern = re.compile(r"(\d+)\s*([hms])", re.IGNORECASE)
     matches = pattern.findall(interval_str)
     if not matches:
         raise ValueError(
@@ -38,7 +38,7 @@ def parse_interval(interval_str: str) -> int:
             "Use formats like '30m', '1h', '15m', '90s', or '1h30m'."
         )
 
-    multipliers = {'h': 3600, 'm': 60, 's': 1}
+    multipliers = {"h": 3600, "m": 60, "s": 1}
     for value, unit in matches:
         total += int(value) * multipliers[unit.lower()]
     return total
@@ -70,8 +70,10 @@ def run_watch(interval_seconds: int, pipeline_fn, **kwargs):
     signal.signal(signal.SIGTERM, _handle_signal)
 
     run_count = 0
-    print(f"[watch] Starting scheduled refresh every {interval_seconds}s "
-          f"({interval_seconds // 60}m).  Press Ctrl+C to stop.")
+    print(
+        f"[watch] Starting scheduled refresh every {interval_seconds}s "
+        f"({interval_seconds // 60}m).  Press Ctrl+C to stop."
+    )
 
     while not stop:
         run_count += 1
