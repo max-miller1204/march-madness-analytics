@@ -1,0 +1,91 @@
+name: Accuracy Report
+
+on:
+  workflow_run:
+    workflows: ["Scheduled Tournament Refresh"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+
+    permissions:
+      contents: write
+      issues: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main # ensure latest after refresh commit
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Generate accuracy dashboard
+        run: python scripts/refresh.py accuracy
+
+      - name: Commit updated dashboard
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add images/accuracy_dashboard.png scraped_data/accuracy_log.json
+          git diff --cached --quiet || git commit -m "chore: update accuracy dashboard"
+          git push
+
+      - name: Post accuracy summary to issue
+        if: hashFiles('scraped_data/accuracy_log.json') != ''
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const data = JSON.parse(fs.readFileSync('scraped_data/accuracy_log.json', 'utf8'));
+            const runs = data.runs || [];
+            if (runs.length === 0) return;
+            const latest = runs[runs.length - 1];
+            const summary = latest.summary || {};
+
+            const body = [
+              `## Accuracy Report — ${latest.timestamp || new Date().toISOString()}`,
+              '',
+              `| Metric | Value |`,
+              `|--------|-------|`,
+              `| Games tracked | ${summary.total_games ?? 'N/A'} |`,
+              `| Correct picks | ${summary.correct ?? 'N/A'} |`,
+              `| Accuracy | ${summary.accuracy != null ? (summary.accuracy * 100).toFixed(1) + '%' : 'N/A'} |`,
+              `| Upsets caught | ${summary.upsets_caught ?? 'N/A'} |`,
+              '',
+              '![Accuracy Dashboard](images/accuracy_dashboard.png)',
+            ].join('\n');
+
+            // Find or create a pinned tracking issue
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'accuracy-tracking',
+              state: 'open',
+            });
+
+            if (issues.length > 0) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issues[0].number,
+                body,
+              });
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: '📊 Tournament Accuracy Tracking',
+                body,
+                labels: ['accuracy-tracking'],
+              });
+            }
