@@ -517,8 +517,12 @@ def track_accuracy(state_path=None, log_path=None):
                 # long-format prediction IDs (e.g. "M_Round of 64_Michigan")
                 _team_to_gid = {}
                 for g in completed:
-                    _team_to_gid[(g.get("round", ""), g.get("team_a", ""))] = g["game_id"]
-                    _team_to_gid[(g.get("round", ""), g.get("team_b", ""))] = g["game_id"]
+                    _team_to_gid[(g.get("round", ""), g.get("team_a", ""))] = g[
+                        "game_id"
+                    ]
+                    _team_to_gid[(g.get("round", ""), g.get("team_b", ""))] = g[
+                        "game_id"
+                    ]
 
                 for round_name_key, games in pat.items():
                     for pred_id, pred in games.items():
