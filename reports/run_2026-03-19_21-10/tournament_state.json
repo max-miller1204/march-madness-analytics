@@ -1,0 +1,30 @@
+{
+  "last_updated": "2026-03-19T21:10:14.607459+00:00",
+  "current_round": "Round of 64",
+  "completed_games": [
+    {
+      "game_id": "M1",
+      "round": "Championship",
+      "region": "Midwest",
+      "seed_a": 0,
+      "team_a": "UMBC",
+      "seed_b": 0,
+      "team_b": "Howard",
+      "score_a": 83,
+      "score_b": 86,
+      "winner": "Howard",
+      "margin": 3,
+      "completed_at": "2026-03-19T21:10:14.607444+00:00"
+    }
+  ],
+  "predictions_at_time": {},
+  "eliminated_teams": [
+    "UMBC"
+  ],
+  "advancing_teams": {
+    "M1": {
+      "team": "Howard",
+      "seed": 0
+    }
+  }
+}
