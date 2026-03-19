@@ -1,7 +1,5 @@
 """Tests for foundation phase: tournament state, validator, and locked_results in simulators."""
 
-import tempfile
-
 import numpy as np
 import pandas as pd
 import pytest
@@ -23,6 +21,7 @@ from scripts.refresh.validator import DataValidator
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture
 def tmp_state_path(tmp_path):
@@ -60,6 +59,7 @@ def net_lookup(kenpom_df):
 # TournamentState
 # ---------------------------------------------------------------------------
 
+
 class TestTournamentState:
     def test_default_state(self, tmp_state_path):
         ts = TournamentState(tmp_state_path)
@@ -68,7 +68,9 @@ class TestTournamentState:
 
     def test_add_result(self, tmp_state_path):
         ts = TournamentState(tmp_state_path)
-        added = ts.add_result("E1", "Round of 64", "East", 1, "Duke", 16, "Siena", 82, 55)
+        added = ts.add_result(
+            "E1", "Round of 64", "East", 1, "Duke", 16, "Siena", 82, 55
+        )
         assert added is True
         assert ts.games_completed_count() == 1
         assert ts.detect_round() == "Round of 64"
@@ -76,7 +78,9 @@ class TestTournamentState:
     def test_duplicate_result_rejected(self, tmp_state_path):
         ts = TournamentState(tmp_state_path)
         ts.add_result("E1", "Round of 64", "East", 1, "Duke", 16, "Siena", 82, 55)
-        added = ts.add_result("E1", "Round of 64", "East", 1, "Duke", 16, "Siena", 82, 55)
+        added = ts.add_result(
+            "E1", "Round of 64", "East", 1, "Duke", 16, "Siena", 82, 55
+        )
         assert added is False
         assert ts.games_completed_count() == 1
 
@@ -105,7 +109,9 @@ class TestTournamentState:
         assert ts.detect_round() == "Pre-tournament"  # 0 games
 
         for i in range(32):
-            ts.add_result(f"G{i}", "Round of 64", "East", 1, f"W{i}", 16, f"L{i}", 70, 60)
+            ts.add_result(
+                f"G{i}", "Round of 64", "East", 1, f"W{i}", 16, f"L{i}", 70, 60
+            )
         assert ts.detect_round() == "Round of 64"  # 32 games
 
         ts.add_result("G32", "Round of 32", "East", 1, "W32", 8, "L32", 70, 60)
@@ -126,13 +132,22 @@ class TestTournamentState:
 # DataValidator
 # ---------------------------------------------------------------------------
 
+
 class TestDataValidator:
     def test_valid_game(self):
         v = DataValidator()
-        assert v.validate_tournament_results([{
-            "game_id": "E1", "team_a": "Duke", "team_b": "Siena",
-            "score_a": 82, "score_b": 55, "winner": "Duke",
-        }])
+        assert v.validate_tournament_results(
+            [
+                {
+                    "game_id": "E1",
+                    "team_a": "Duke",
+                    "team_b": "Siena",
+                    "score_a": 82,
+                    "score_b": 55,
+                    "winner": "Duke",
+                }
+            ]
+        )
 
     def test_empty_list_valid(self):
         v = DataValidator()
@@ -140,25 +155,45 @@ class TestDataValidator:
 
     def test_zero_score_rejected(self):
         v = DataValidator()
-        assert not v.validate_tournament_results([{
-            "game_id": "E1", "team_a": "A", "team_b": "B",
-            "score_a": 0, "score_b": 55, "winner": "B",
-        }])
+        assert not v.validate_tournament_results(
+            [
+                {
+                    "game_id": "E1",
+                    "team_a": "A",
+                    "team_b": "B",
+                    "score_a": 0,
+                    "score_b": 55,
+                    "winner": "B",
+                }
+            ]
+        )
 
     def test_duplicate_game_ids_rejected(self):
         v = DataValidator()
         game = {
-            "game_id": "E1", "team_a": "Duke", "team_b": "Siena",
-            "score_a": 82, "score_b": 55, "winner": "Duke",
+            "game_id": "E1",
+            "team_a": "Duke",
+            "team_b": "Siena",
+            "score_a": 82,
+            "score_b": 55,
+            "winner": "Duke",
         }
         assert not v.validate_tournament_results([game, game])
 
     def test_wrong_winner_rejected(self):
         v = DataValidator()
-        assert not v.validate_tournament_results([{
-            "game_id": "E1", "team_a": "Duke", "team_b": "Siena",
-            "score_a": 82, "score_b": 55, "winner": "Siena",
-        }])
+        assert not v.validate_tournament_results(
+            [
+                {
+                    "game_id": "E1",
+                    "team_a": "Duke",
+                    "team_b": "Siena",
+                    "score_a": 82,
+                    "score_b": 55,
+                    "winner": "Siena",
+                }
+            ]
+        )
 
     def test_bracket_csv_validation(self, bracket_df):
         v = DataValidator()
@@ -169,6 +204,7 @@ class TestDataValidator:
 # Locked Results in Simulators
 # ---------------------------------------------------------------------------
 
+
 class TestLockedResults:
     @staticmethod
     def _make_wp(net_lookup):
@@ -176,6 +212,7 @@ class TestLockedResults:
             na = net_lookup.get(ta, 0)
             nb = net_lookup.get(tb, 0)
             return 1 / (1 + 10 ** (-(na - nb) / 22))
+
         return wp
 
     def test_locked_game_deterministic(self, east_matchups, net_lookup):
@@ -186,13 +223,18 @@ class TestLockedResults:
         for i in range(100):
             rng = np.random.default_rng(i)
             _, _, results = _simulate_region(
-                east_matchups, wp, rng, locked_results=locked, region="East")
-            assert results[0][1] == team_b, f"Sim {i}: expected {team_b}, got {results[0][1]}"
+                east_matchups, wp, rng, locked_results=locked, region="East"
+            )
+            assert results[0][1] == team_b, (
+                f"Sim {i}: expected {team_b}, got {results[0][1]}"
+            )
 
     def test_empty_locked_results_unchanged(self, east_matchups, net_lookup):
         wp = self._make_wp(net_lookup)
         rng1 = np.random.default_rng(42)
-        w1, _, _ = _simulate_region(east_matchups, wp, rng1, locked_results={}, region="East")
+        w1, _, _ = _simulate_region(
+            east_matchups, wp, rng1, locked_results={}, region="East"
+        )
         rng2 = np.random.default_rng(42)
         w2, _, _ = _simulate_region(east_matchups, wp, rng2)
         assert w1 == w2
@@ -202,8 +244,13 @@ class TestLockedResults:
         prior = HistoricalPrior("scraped_data")
         locked = {"E1": {"winner": "Siena", "seed": 16}}
         sim = QuantEnhancedSimulator(
-            bracket_df=bracket_df, kenpom_df=kenpom_df, garch=garch,
-            prior=prior, locked_results=locked, n_sims=50, seed=42,
+            bracket_df=bracket_df,
+            kenpom_df=kenpom_df,
+            garch=garch,
+            prior=prior,
+            locked_results=locked,
+            n_sims=50,
+            seed=42,
         )
         result = sim.run()
         assert result["champion"] is not None
@@ -212,8 +259,12 @@ class TestLockedResults:
         garch = HierarchicalGARCH(games_df)
         locked = {"E1": {"winner": "Siena", "seed": 16}}
         sim = EVOptimizedSimulator(
-            bracket_df=bracket_df, kenpom_df=kenpom_df, garch=garch,
-            locked_results=locked, n_sims=50, seed=42,
+            bracket_df=bracket_df,
+            kenpom_df=kenpom_df,
+            garch=garch,
+            locked_results=locked,
+            n_sims=50,
+            seed=42,
         )
         result = sim.run()
         assert result["champion"] is not None

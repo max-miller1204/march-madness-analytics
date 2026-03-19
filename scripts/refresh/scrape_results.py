@@ -268,7 +268,7 @@ def _fetch_with_retry(url, retries=MAX_RETRIES, backoff=BACKOFF_BASE):
             return resp
         except requests.RequestException as exc:
             last_exc = exc
-            wait = backoff * (3 ** attempt)  # 1, 3, 9
+            wait = backoff * (3**attempt)  # 1, 3, 9
             logger.warning(
                 "Attempt %d/%d failed for %s: %s — retrying in %ss",
                 attempt + 1,
@@ -299,9 +299,7 @@ def _parse_espn_scoreboard(html, bracket_teams, bracket_games, existing_ids):
     # Try to extract the __espnfitt__ or window.espn.scoreboardData JSON
     games_data = _extract_espn_json(soup)
     if games_data:
-        completed = _parse_from_json(
-            games_data, bracket_teams, bracket_games, seen_ids
-        )
+        completed = _parse_from_json(games_data, bracket_teams, bracket_games, seen_ids)
         if completed:
             return completed
 
@@ -316,9 +314,7 @@ def _extract_espn_json(soup):
         text = script.string or ""
         # window.espn.scoreboardData pattern
         if "window.espn.scoreboardData" in text or "scoreboardData" in text:
-            match = re.search(
-                r"scoreboardData\s*=\s*(\{.*?\});", text, re.DOTALL
-            )
+            match = re.search(r"scoreboardData\s*=\s*(\{.*?\});", text, re.DOTALL)
             if match:
                 try:
                     data = json.loads(match.group(1))
@@ -375,9 +371,7 @@ def _parse_from_json(events, bracket_teams, bracket_games, seen_ids):
                     score = int(c.get("score", "0"))
                 except (ValueError, TypeError):
                     score = 0
-                teams_info.append(
-                    {"name": name, "seed": seed, "score": score}
-                )
+                teams_info.append({"name": name, "seed": seed, "score": score})
 
             if len(teams_info) < 2:
                 continue
@@ -455,19 +449,21 @@ def _parse_from_html(soup, bracket_teams, bracket_games, seen_ids):
 
     for card in game_cards:
         # Check if game is final
-        status_el = card.find(
-            string=re.compile(r"Final", re.I)
-        ) or card.find(class_=re.compile(r"status", re.I))
+        status_el = card.find(string=re.compile(r"Final", re.I)) or card.find(
+            class_=re.compile(r"status", re.I)
+        )
         if not status_el:
             continue
-        status_text = status_el.get_text(strip=True) if hasattr(status_el, "get_text") else str(status_el)
+        status_text = (
+            status_el.get_text(strip=True)
+            if hasattr(status_el, "get_text")
+            else str(status_el)
+        )
         if "final" not in status_text.lower():
             continue
 
         # Extract team names and scores from competitor rows
-        team_rows = card.select("li.ScoreboardScoreCell__Item") or card.select(
-            "tr"
-        )
+        team_rows = card.select("li.ScoreboardScoreCell__Item") or card.select("tr")
         if len(team_rows) < 2:
             team_rows = card.find_all("div", class_=re.compile(r"competitor", re.I))
         if len(team_rows) < 2:
@@ -491,9 +487,8 @@ def _parse_from_html(soup, bracket_teams, bracket_games, seen_ids):
                 seed = 0
 
             # Score
-            score_el = (
-                row.select_one("div.ScoreCell__Score")
-                or row.find("span", class_=re.compile(r"score", re.I))
+            score_el = row.select_one("div.ScoreCell__Score") or row.find(
+                "span", class_=re.compile(r"score", re.I)
             )
             try:
                 score = int(score_el.get_text(strip=True)) if score_el else 0
@@ -581,19 +576,13 @@ def _validate_results(new_games, existing_games, bracket_teams):
 
         # Scores are positive integers
         if not isinstance(g["score_a"], int) or g["score_a"] <= 0:
-            issues.append(
-                f"Invalid score_a ({g['score_a']}) in {g['game_id']}"
-            )
+            issues.append(f"Invalid score_a ({g['score_a']}) in {g['game_id']}")
         if not isinstance(g["score_b"], int) or g["score_b"] <= 0:
-            issues.append(
-                f"Invalid score_b ({g['score_b']}) in {g['game_id']}"
-            )
+            issues.append(f"Invalid score_b ({g['score_b']}) in {g['game_id']}")
 
         # Winner must be in bracket
         if g["winner"] not in bracket_teams:
-            issues.append(
-                f"Winner '{g['winner']}' not found in bracket teams"
-            )
+            issues.append(f"Winner '{g['winner']}' not found in bracket teams")
 
         # Winner must be one of the two teams
         if g["winner"] not in (g["team_a"], g["team_b"]):
@@ -622,9 +611,11 @@ def _validate_results(new_games, existing_games, bracket_teams):
         if g["winner"] in losers:
             # Could be valid across rounds, so only flag within same round
             same_round_loss = any(
-                (v["winner"] != g["winner"]
-                 and g["winner"] in (v["team_a"], v["team_b"])
-                 and v["round"] == g["round"])
+                (
+                    v["winner"] != g["winner"]
+                    and g["winner"] in (v["team_a"], v["team_b"])
+                    and v["round"] == g["round"]
+                )
                 for v in valid
             )
             if same_round_loss:
@@ -695,9 +686,6 @@ def scrape_tournament_results(
     today = datetime.now()
     dates_to_try = []
     for offset in range(0, 7):
-        d = today.replace(
-            day=today.day - offset
-        ) if today.day - offset > 0 else today
         try:
             dt = today.replace(day=today.day - offset)
             dates_to_try.append(dt.strftime("%Y%m%d"))

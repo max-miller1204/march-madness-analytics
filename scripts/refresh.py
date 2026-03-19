@@ -14,7 +14,6 @@ Usage examples:
 """
 
 import argparse
-import os
 import subprocess
 import sys
 from pathlib import Path
@@ -30,6 +29,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 # continue.
 # ---------------------------------------------------------------------------
 
+
 def _try_import(module_path: str, func_name: str):
     """Return *func_name* from *module_path*, or ``None`` with a warning."""
     try:
@@ -44,11 +44,9 @@ def _try_import(module_path: str, func_name: str):
 # Pipeline steps
 # ---------------------------------------------------------------------------
 
+
 def step_scrape(**kwargs):
     """Re-run the existing metric scrapers (KenPom, NET, injuries)."""
-    refresh = kwargs.get("refresh", False)
-    scripts_dir = PROJECT_ROOT / "scripts"
-
     scrapers = [
         ("scrape_net_teamsheets", "main"),
         ("scrape_injuries", "main"),
@@ -104,9 +102,15 @@ def step_simulate(**kwargs):
             try:
                 subprocess.run(
                     [
-                        sys.executable, "-m", "jupyter", "nbconvert",
-                        "--execute", str(notebook_path),
-                        "--to", "notebook", "--inplace",
+                        sys.executable,
+                        "-m",
+                        "jupyter",
+                        "nbconvert",
+                        "--execute",
+                        str(notebook_path),
+                        "--to",
+                        "notebook",
+                        "--inplace",
                     ],
                     check=True,
                     cwd=str(PROJECT_ROOT),
@@ -115,7 +119,9 @@ def step_simulate(**kwargs):
             except subprocess.CalledProcessError as exc:
                 print(f"[WARN] Notebook execution failed (exit {exc.returncode})")
             except FileNotFoundError:
-                print("[WARN] jupyter nbconvert not found — skipping notebook execution")
+                print(
+                    "[WARN] jupyter nbconvert not found — skipping notebook execution"
+                )
         else:
             print("[SKIP] Notebook not found")
     else:
@@ -147,19 +153,24 @@ def step_changelog(**kwargs):
             completed_games = []
             if state_path.exists():
                 import json
+
                 with open(state_path) as f:
                     state = json.load(f)
                 for g in state.get("completed_games", []):
-                    completed_games.append({
-                        "game_id": g.get("game_id", "?"),
-                        "result": (f"({g.get('seed_a', '?')}) {g.get('team_a', '?')} "
-                                   f"{g.get('score_a', '?')}-{g.get('score_b', '?')} "
-                                   f"{g.get('team_b', '?')} ({g.get('seed_b', '?')})"),
-                        "predicted_winner": g.get("predicted_winner", "N/A"),
-                        "predicted_prob": g.get("predicted_prob", 0.0),
-                        "correct": g.get("correct", False),
-                        "upset": g.get("upset", False),
-                    })
+                    completed_games.append(
+                        {
+                            "game_id": g.get("game_id", "?"),
+                            "result": (
+                                f"({g.get('seed_a', '?')}) {g.get('team_a', '?')} "
+                                f"{g.get('score_a', '?')}-{g.get('score_b', '?')} "
+                                f"{g.get('team_b', '?')} ({g.get('seed_b', '?')})"
+                            ),
+                            "predicted_winner": g.get("predicted_winner", "N/A"),
+                            "predicted_prob": g.get("predicted_prob", 0.0),
+                            "correct": g.get("correct", False),
+                            "upset": g.get("upset", False),
+                        }
+                    )
 
             # Load accuracy summary if available
             accuracy_path = PROJECT_ROOT / "scraped_data" / "accuracy_log.json"
@@ -229,6 +240,7 @@ def run_full_pipeline(**kwargs):
 # CLI
 # ---------------------------------------------------------------------------
 
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="refresh",
@@ -237,15 +249,19 @@ def build_parser() -> argparse.ArgumentParser:
 
     # Global flags
     parser.add_argument(
-        "--tournament-weight", type=float, default=2.0,
+        "--tournament-weight",
+        type=float,
+        default=2.0,
         help="Weight multiplier for tournament games (default: 2.0)",
     )
     parser.add_argument(
-        "--refresh", action="store_true",
+        "--refresh",
+        action="store_true",
         help="Force re-scrape ignoring TTL cache",
     )
     parser.add_argument(
-        "--no-notebook", action="store_true",
+        "--no-notebook",
+        action="store_true",
         help="Skip notebook re-execution (just update data)",
     )
 
@@ -264,7 +280,9 @@ def build_parser() -> argparse.ArgumentParser:
     # Scheduled mode
     watch_p = sub.add_parser("watch", help="Scheduled polling mode")
     watch_p.add_argument(
-        "--interval", type=str, default="30m",
+        "--interval",
+        type=str,
+        default="30m",
         help="Polling interval (e.g. 15m, 30m, 1h). Default: 30m",
     )
 
@@ -285,16 +303,17 @@ def main():
     command = args.command or "all"
 
     dispatch = {
-        "all":      run_full_pipeline,
-        "scrape":   step_scrape,
-        "results":  step_results,
+        "all": run_full_pipeline,
+        "scrape": step_scrape,
+        "results": step_results,
         "simulate": step_simulate,
         "accuracy": step_accuracy,
-        "archive":  step_archive,
+        "archive": step_archive,
     }
 
     if command == "watch":
         from refresh.scheduler import parse_interval, run_watch
+
         interval = parse_interval(args.interval)
         run_watch(interval, run_full_pipeline, **kwargs)
     elif command in dispatch:

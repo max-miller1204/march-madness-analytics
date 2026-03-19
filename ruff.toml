@@ -1,0 +1,7 @@
+exclude = ["Quant-Guild-Library", "*.ipynb"]
+
+[lint]
+# Relax rules for existing codebase — tighten over time
+ignore = [
+    "E741",  # ambiguous variable name (l used throughout for "loser")
+]

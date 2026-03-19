@@ -74,8 +74,18 @@ class TournamentState:
                 break
         return current
 
-    def add_result(self, game_id, round_name, region, seed_a, team_a,
-                   seed_b, team_b, score_a, score_b):
+    def add_result(
+        self,
+        game_id,
+        round_name,
+        region,
+        seed_a,
+        team_a,
+        seed_b,
+        team_b,
+        score_a,
+        score_b,
+    ):
         """Add a completed game result. Returns True if new, False if duplicate."""
         # Check for duplicate
         existing_ids = {g["game_id"] for g in self.state["completed_games"]}
@@ -162,10 +172,10 @@ class TournamentState:
 
         prefix = REGION_PREFIXES.get(region, "X")
         offsets = {
-            "Round of 64": 1,      # E1-E8
-            "Round of 32": 9,      # E9-E12
-            "Sweet 16": 13,        # E13-E14
-            "Elite 8": 15,         # E15
+            "Round of 64": 1,  # E1-E8
+            "Round of 32": 9,  # E9-E12
+            "Sweet 16": 13,  # E13-E14
+            "Elite 8": 15,  # E15
         }
         offset = offsets.get(round_name, 1)
         return f"{prefix}{offset + game_index}"

@@ -1,0 +1,38 @@
+name: Scheduled Tournament Refresh
+
+on:
+  schedule:
+    # Every 30 minutes during March Madness peak hours (noon-midnight ET, UTC 16:00-04:00)
+    - cron: "*/30 16-23 * 3 *"
+    - cron: "*/30 0-4 * 3 *"
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt pytest
+
+      - name: Run refresh pipeline
+        run: python scripts/refresh.py all --no-notebook
+
+      - name: Commit updated data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add scraped_data/ reports/ images/
+          git diff --cached --quiet || git commit -m "chore: scheduled tournament data refresh"
+          git push

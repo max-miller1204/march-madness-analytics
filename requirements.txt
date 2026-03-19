@@ -11,3 +11,4 @@ notebook
 arch
 hmmlearn
 filterpy
+ruff
