@@ -3,6 +3,18 @@
 A composite analytical pipeline that predicts NCAA Tournament Final Four teams and produces a full 63-game bracket using KenPom efficiency metrics, real NCAA NET rankings, committee evaluation metrics (SOR, WAB, KPI, BPI), quantitative models (GARCH volatility, HMM regime detection, Kalman momentum filtering, historical seed priors), Monte Carlo bracket simulation, and seed-constraint optimization.
 
 <!-- ACCURACY_START -->
+## Tournament Accuracy Tracker
+
+*Last updated: 2026-03-19T21:32:11Z*
+
+| Metric | Value |
+|--------|-------|
+| Games tracked | 6 |
+| Correct picks | 4/6 |
+| Accuracy | 66.7% |
+| Upsets caught | 0/2 |
+
+![Accuracy Dashboard](images/accuracy_dashboard.png)
 <!-- ACCURACY_END -->
 
 ## How It Works

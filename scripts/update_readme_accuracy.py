@@ -26,14 +26,15 @@ def build_section() -> str:
     summary = latest.get("summary", {})
     timestamp = latest.get("timestamp", "unknown")
 
-    total = summary.get("total_games", 0)
+    total = latest.get("games_completed", 0)
     if total == 0:
         return ""
 
-    correct = summary.get("correct", 0)
     accuracy = summary.get("accuracy", 0)
-    upsets_caught = summary.get("upsets_caught", "N/A")
-    upsets_total = summary.get("upsets_total", "N/A")
+    correct = round(accuracy * total)
+    upsets_caught = summary.get("upsets_predicted_correctly", 0)
+    upsets_missed = summary.get("upsets_missed", 0)
+    upsets_total = upsets_caught + upsets_missed
 
     pct = f"{accuracy * 100:.1f}%" if isinstance(accuracy, (int, float)) else "N/A"
 

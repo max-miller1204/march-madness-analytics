@@ -143,7 +143,335 @@
       "completed_at": "2026-03-19T21:20:03.241648+00:00"
     }
   ],
-  "predictions_at_time": {},
+  "predictions_at_time": {
+    "Round of 64": {
+      "E1": {
+        "predicted_winner": "Duke",
+        "win_prob": 0.9842,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "E8": {
+        "predicted_winner": "UConn",
+        "win_prob": 0.9592,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "E6": {
+        "predicted_winner": "Michigan State",
+        "win_prob": 0.9186,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "E4": {
+        "predicted_winner": "Kansas",
+        "win_prob": 0.8724,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "E3": {
+        "predicted_winner": "St. John's",
+        "win_prob": 0.8107,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "E5": {
+        "predicted_winner": "Louisville",
+        "win_prob": 0.7295,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "E7": {
+        "predicted_winner": "UCLA",
+        "win_prob": 0.6696,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "E2": {
+        "predicted_winner": "Ohio State",
+        "win_prob": 0.6165,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "M_Round of 64_Michigan": {
+        "predicted_winner": "Michigan",
+        "win_prob": 0.9861,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "M8": {
+        "predicted_winner": "Iowa State",
+        "win_prob": 0.9733,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "M6": {
+        "predicted_winner": "Virginia",
+        "win_prob": 0.9288,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "M4": {
+        "predicted_winner": "Alabama",
+        "win_prob": 0.8465,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "M3": {
+        "predicted_winner": "Texas Tech",
+        "win_prob": 0.7829,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "M_Round of 64_Tennessee": {
+        "predicted_winner": "Tennessee",
+        "win_prob": 0.6943,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "M2": {
+        "predicted_winner": "Georgia",
+        "win_prob": 0.5639,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "M7": {
+        "predicted_winner": "Kentucky",
+        "win_prob": 0.55,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "S_Round of 64_Florida": {
+        "predicted_winner": "Florida",
+        "win_prob": 0.9891,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "S8": {
+        "predicted_winner": "Houston",
+        "win_prob": 0.9684,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "S6": {
+        "predicted_winner": "Illinois",
+        "win_prob": 0.9614,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "S4": {
+        "predicted_winner": "Nebraska",
+        "win_prob": 0.9311,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "S3": {
+        "predicted_winner": "Vanderbilt",
+        "win_prob": 0.8278,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "S7": {
+        "predicted_winner": "Saint Mary's",
+        "win_prob": 0.6069,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "S5": {
+        "predicted_winner": "North Carolina",
+        "win_prob": 0.5965,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "S2": {
+        "predicted_winner": "Iowa",
+        "win_prob": 0.5789,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "W1": {
+        "predicted_winner": "Arizona",
+        "win_prob": 0.9857,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "W8": {
+        "predicted_winner": "Purdue",
+        "win_prob": 0.9686,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "W6": {
+        "predicted_winner": "Gonzaga",
+        "win_prob": 0.9475,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "W4": {
+        "predicted_winner": "Arkansas",
+        "win_prob": 0.8926,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "W3": {
+        "predicted_winner": "Wisconsin",
+        "win_prob": 0.8286,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "W7": {
+        "predicted_winner": "Miami (FL)",
+        "win_prob": 0.6399,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "W_Round of 64_BYU": {
+        "predicted_winner": "BYU",
+        "win_prob": 0.5909,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "W2": {
+        "predicted_winner": "Utah State",
+        "win_prob": 0.5132,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      }
+    },
+    "Round of 32": {
+      "E_Round of 32_Duke": {
+        "predicted_winner": "Duke",
+        "win_prob": 0.8536,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "E_Round of 32_UConn": {
+        "predicted_winner": "UConn",
+        "win_prob": 0.6697,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "E_Round of 32_Michigan State": {
+        "predicted_winner": "Michigan State",
+        "win_prob": 0.5749,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "E_Round of 32_St. John's": {
+        "predicted_winner": "St. John's",
+        "win_prob": 0.4707,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "M_Round of 32_Michigan": {
+        "predicted_winner": "Michigan",
+        "win_prob": 0.8497,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "M_Round of 32_Iowa State": {
+        "predicted_winner": "Iowa State",
+        "win_prob": 0.7536,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "M_Round of 32_Virginia": {
+        "predicted_winner": "Virginia",
+        "win_prob": 0.5373,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "M_Round of 32_Alabama": {
+        "predicted_winner": "Alabama",
+        "win_prob": 0.4803,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "S_Round of 32_Florida": {
+        "predicted_winner": "Florida",
+        "win_prob": 0.7815,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "S_Round of 32_Illinois": {
+        "predicted_winner": "Illinois",
+        "win_prob": 0.7619,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "S_Round of 32_Houston": {
+        "predicted_winner": "Houston",
+        "win_prob": 0.7579,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "S_Round of 32_Nebraska": {
+        "predicted_winner": "Nebraska",
+        "win_prob": 0.4896,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "W_Round of 32_Arizona": {
+        "predicted_winner": "Arizona",
+        "win_prob": 0.8488,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "W_Round of 32_Purdue": {
+        "predicted_winner": "Purdue",
+        "win_prob": 0.753,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "W_Round of 32_Gonzaga": {
+        "predicted_winner": "Gonzaga",
+        "win_prob": 0.6261,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "W_Round of 32_Arkansas": {
+        "predicted_winner": "Arkansas",
+        "win_prob": 0.5563,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      }
+    },
+    "Sweet 16": {
+      "E_Sweet 16_Duke": {
+        "predicted_winner": "Duke",
+        "win_prob": 0.6946,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "E_Sweet 16_UConn": {
+        "predicted_winner": "UConn",
+        "win_prob": 0.3668,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "M_Sweet 16_Michigan": {
+        "predicted_winner": "Michigan",
+        "win_prob": 0.6694,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "M_Sweet 16_Iowa State": {
+        "predicted_winner": "Iowa State",
+        "win_prob": 0.5066,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "S_Sweet 16_Florida": {
+        "predicted_winner": "Florida",
+        "win_prob": 0.5331,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "S_Sweet 16_Houston": {
+        "predicted_winner": "Houston",
+        "win_prob": 0.4594,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "W_Sweet 16_Arizona": {
+        "predicted_winner": "Arizona",
+        "win_prob": 0.6779,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "W_Sweet 16_Purdue": {
+        "predicted_winner": "Purdue",
+        "win_prob": 0.4723,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      }
+    },
+    "Elite 8": {
+      "E_Elite 8_Duke": {
+        "predicted_winner": "Duke",
+        "win_prob": 0.5436,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "M_Elite 8_Michigan": {
+        "predicted_winner": "Michigan",
+        "win_prob": 0.4757,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "S_Elite 8_Florida": {
+        "predicted_winner": "Florida",
+        "win_prob": 0.3,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "W_Elite 8_Arizona": {
+        "predicted_winner": "Arizona",
+        "win_prob": 0.4857,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      }
+    },
+    "Final Four": {
+      "X_Final Four_Duke": {
+        "predicted_winner": "Duke",
+        "win_prob": 0.3728,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      },
+      "X_Final Four_Arizona": {
+        "predicted_winner": "Arizona",
+        "win_prob": 0.297,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      }
+    },
+    "Championship": {
+      "X_Championship_Duke": {
+        "predicted_winner": "Duke",
+        "win_prob": 0.2331,
+        "predicted_at": "2026-03-19T21:31:28.740814+00:00"
+      }
+    }
+  },
   "eliminated_teams": [
     "UMBC",
     "McNeese",

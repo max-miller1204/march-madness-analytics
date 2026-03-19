@@ -497,8 +497,32 @@ def track_accuracy(state_path=None, log_path=None):
             with open(state_path, "r") as f:
                 state = json.load(f)
 
+            # Support both flat "predictions" list and nested "predictions_at_time" dict
             predictions = state.get("predictions", [])
+            if not predictions:
+                pat = state.get("predictions_at_time", {})
+                for round_name_key, games in pat.items():
+                    for game_id, pred in games.items():
+                        predictions.append(
+                            {
+                                "game_id": game_id,
+                                "predicted_winner": pred["predicted_winner"],
+                                "predicted_prob": pred.get("win_prob", 0.5),
+                                "round": round_name_key,
+                            }
+                        )
+
             completed = state.get("completed_games", [])
+            # Ensure higher_seed_won is set for upset detection
+            for g in completed:
+                if "higher_seed_won" not in g:
+                    sa = g.get("seed_a", 0)
+                    sb = g.get("seed_b", 0)
+                    if sa and sb:
+                        higher_seed = g["team_a"] if sa < sb else g["team_b"]
+                        g["higher_seed_won"] = g["winner"] == higher_seed
+                    else:
+                        g["higher_seed_won"] = True  # default
 
             if predictions and completed:
                 summary = tracker.log_run(predictions, completed)
