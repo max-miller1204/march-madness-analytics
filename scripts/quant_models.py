@@ -541,7 +541,7 @@ class HistoricalPrior:
 
         n = self.sample_sizes.get(key, 50)
         w_hist = np.sqrt(n)
-        base_weight = 10.0
+        base_weight = 25.0
         w_model = base_weight / max(combined_vol, 1.0)
 
         blended = (w_hist * p_hist + w_model * p_model) / (w_hist + w_model)
@@ -655,8 +655,9 @@ class EVOptimizedSimulator:
         kalman=None,
         n_sims=10000,
         seed=42,
-        leverage_weight=1.0,
+        leverage_weight=1.5,
         locked_results=None,
+        tournament_adjustments=None,
         # Aliases for notebook compatibility
         df=None,
         bracket=None,
@@ -670,6 +671,7 @@ class EVOptimizedSimulator:
         self.seed = seed
         self.leverage_weight = leverage_weight
         self.locked_results = locked_results or {}
+        self.tournament_adjustments = tournament_adjustments or {}
         self.pub = PublicOwnership()
 
         # Build lookups
@@ -689,12 +691,17 @@ class EVOptimizedSimulator:
         net_a = self.net_lookup.get(team_a, 0.0)
         net_b = self.net_lookup.get(team_b, 0.0)
 
+        # Tournament performance adjustment (compounding across games)
+        if self.tournament_adjustments:
+            net_a = net_a + self.tournament_adjustments.get(team_a, 0.0)
+            net_b = net_b + self.tournament_adjustments.get(team_b, 0.0)
+
         # HMM state adjustment
         if self.hmm is not None:
             adj_a = self.hmm.sample_state_adjustment(team_a, rng)
             adj_b = self.hmm.sample_state_adjustment(team_b, rng)
-            net_a = net_a + adj_a * 0.1
-            net_b = net_b + adj_b * 0.1
+            net_a = net_a + adj_a * 0.3
+            net_b = net_b + adj_b * 0.3
 
         margin = (net_a - net_b) / 2
 
@@ -914,6 +921,7 @@ class QuantEnhancedSimulator:
         n_sims=10000,
         seed=42,
         locked_results=None,
+        tournament_adjustments=None,
         # Aliases for notebook compatibility
         df=None,
         bracket=None,
@@ -928,6 +936,7 @@ class QuantEnhancedSimulator:
         self.n_sims = n_sims
         self.seed = seed
         self.locked_results = locked_results or {}
+        self.tournament_adjustments = tournament_adjustments or {}
 
         # Build lookups
         self.net_lookup, self.seed_lookup = _build_lookups(self.kenpom_df)
@@ -944,13 +953,18 @@ class QuantEnhancedSimulator:
         net_a = self.net_lookup.get(team_a, 0.0)
         net_b = self.net_lookup.get(team_b, 0.0)
 
+        # Tournament performance adjustment (compounding across games)
+        if self.tournament_adjustments:
+            net_a = net_a + self.tournament_adjustments.get(team_a, 0.0)
+            net_b = net_b + self.tournament_adjustments.get(team_b, 0.0)
+
         # HMM state adjustment
         if self.hmm is not None:
             adj_a = self.hmm.sample_state_adjustment(team_a, rng)
             adj_b = self.hmm.sample_state_adjustment(team_b, rng)
             # Scale down HMM adjustments to avoid dominating
-            net_a = net_a + adj_a * 0.1
-            net_b = net_b + adj_b * 0.1
+            net_a = net_a + adj_a * 0.3
+            net_b = net_b + adj_b * 0.3
 
         # Base win probability
         margin = (net_a - net_b) / 2

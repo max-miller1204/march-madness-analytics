@@ -175,7 +175,7 @@ def _compute_composite_adjustments(
         delta = actual_margin - exp
         team_deltas.setdefault(team, []).append(delta)
 
-    scale = tournament_weight / 10.0
+    scale = tournament_weight / 5.0
     adjustments = {}
     for team, deltas in team_deltas.items():
         avg_delta = sum(deltas) / len(deltas)
