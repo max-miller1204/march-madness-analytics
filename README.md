@@ -5,13 +5,13 @@ A live tournament prediction pipeline that generates a full 63-game bracket, tra
 <!-- ACCURACY_START -->
 ## Tournament Accuracy Tracker
 
-*Last updated: 2026-03-20T04:59:07Z*
+*Last updated: 2026-03-20T16:47:01Z*
 
 | Metric | Value |
 |--------|-------|
-| Games tracked | 16 |
-| Correct picks | 10/16 |
-| Accuracy | 62.5% |
+| Games tracked | 18 |
+| Correct picks | 12/18 |
+| Accuracy | 66.7% |
 | Upsets caught | 0/6 |
 
 ![Accuracy Dashboard](images/accuracy_dashboard.png)
@@ -25,7 +25,9 @@ A live tournament prediction pipeline that generates a full 63-game bracket, tra
 | E5 | (6) Louisville vs (11) South Florida | 83-79 | Louisville | Louisville | 73.0% | Correct |
 | E2 | (8) Ohio State vs (9) TCU | 64-66 | TCU | Ohio State | 61.7% | Wrong |
 | M1 | (1) Michigan vs (16) Howard | 101-80 | Michigan | Michigan | 92.9% | Correct |
+| M3 | (12) Akron vs (5) Texas Tech | 3-6 | Texas Tech | Texas Tech | 78.3% | Correct |
 | M2 | (8) Georgia vs (9) Saint Louis | 77-102 | Saint Louis | Georgia | 56.4% | Wrong |
+| M7 | (10) Santa Clara vs (7) Kentucky | 18-23 | Kentucky | Kentucky | 55.0% | Correct |
 | S8 | (2) Houston vs (15) Idaho | 78-47 | Houston | Houston | 96.8% | Correct |
 | S6 | (3) Illinois vs (14) Penn | 105-70 | Illinois | Illinois | 96.1% | Correct |
 | S4 | (4) Nebraska vs (13) Troy | 76-47 | Nebraska | Nebraska | 93.1% | Correct |
@@ -37,7 +39,7 @@ A live tournament prediction pipeline that generates a full 63-game bracket, tra
 | W3 | (5) Wisconsin vs (12) High Point | 82-83 | High Point | Wisconsin | 82.9% | Wrong |
 | W5 | (6) BYU vs (11) Texas | 71-79 | Texas | BYU | 50.9% | Wrong |
 
-**Record: 10/16 (62.5%) | Upsets caught: 0/6 | All misses were upsets**
+**Record: 12/18 (66.7%) | Upsets caught: 0/6 | All misses were upsets**
 <!-- ACCURACY_END -->
 
 ## How It Works
