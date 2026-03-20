@@ -307,6 +307,11 @@ class HierarchicalGARCH:
             self._fallback()
             return
 
+        if self.alpha + self.beta >= 1.0:
+            print(f"  [GARCH] Non-stationary fit (α+β={self.alpha + self.beta:.3f}) — using fallback")
+            self._fallback()
+            return
+
         # Per-team omega from team's own margin variance
         for team, margins in self.team_margins.items():
             var_t = np.var(margins, ddof=1) if len(margins) > 1 else np.var(margins)
