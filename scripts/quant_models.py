@@ -53,6 +53,11 @@ REGION_PREFIXES = {"East": "E", "South": "S", "West": "W", "Midwest": "M"}
 DEFAULT_SIGMA = 11.0  # Fallback combined volatility (empirical average)
 HMM_SCALE = 0.3       # HMM adjustment dampening factor
 KALMAN_SCALE = 0.15    # Kalman momentum adjustment scale
+PRIOR_BASE_WEIGHT = 25.0  # Relative influence of model vs historical prior in Bayesian blending
+KALMAN_INIT_P = 10.0      # Initial covariance for Kalman momentum filter
+KALMAN_PROCESS_Q = 2.0    # Process noise — higher values make the filter more responsive
+KALMAN_MEASURE_R = 10.0   # Measurement noise — higher values smooth out noisy observations
+ADJUSTMENT_SCALE_DIVISOR = 5.0  # Dampening divisor for composite tournament adjustments
 
 QUAD_WEIGHTS = {
     "Quadrant 1": 1.5,
@@ -482,9 +487,9 @@ class KalmanMomentum:
             kf.x = np.array([[0.0]])  # initial state
             kf.F = np.array([[1.0]])  # state transition
             kf.H = np.array([[1.0]])  # measurement function
-            kf.P = np.array([[10.0]])  # initial covariance
-            kf.Q = np.array([[2.0]])  # process noise
-            kf.R = np.array([[10.0]])  # measurement noise
+            kf.P = np.array([[KALMAN_INIT_P]])   # initial covariance
+            kf.Q = np.array([[KALMAN_PROCESS_Q]])  # process noise
+            kf.R = np.array([[KALMAN_MEASURE_R]])  # measurement noise
 
             for r in residuals:
                 kf.predict()
@@ -550,8 +555,7 @@ class HistoricalPrior:
 
         n = self.sample_sizes.get(key, 50)
         w_hist = np.sqrt(n)
-        base_weight = 25.0
-        w_model = base_weight / max(combined_vol, 1.0)
+        w_model = PRIOR_BASE_WEIGHT / max(combined_vol, 1.0)
 
         blended = (w_hist * p_hist + w_model * p_model) / (w_hist + w_model)
         return blended
@@ -1017,7 +1021,7 @@ class QuantEnhancedSimulator:
         champ_counts = defaultdict(int)
         game_slot_wins = defaultdict(lambda: defaultdict(int))
 
-        for sim in range(self.n_sims):
+        for _sim in range(self.n_sims):
             ff_teams = []
 
             for region in region_order:

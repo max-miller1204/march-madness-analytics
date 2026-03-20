@@ -18,7 +18,6 @@ META_FILE = os.path.join(OUTPUT_DIR, "injuries.meta")
 BRACKET_CSV = os.path.join(OUTPUT_DIR, "bracket.csv")
 TTL_HOURS = 6
 
-from scripts.quant_models import NAME_ALIASES
 
 # Boydsbets team name variants -> standard bracket name
 BOYDS_ALIASES = {

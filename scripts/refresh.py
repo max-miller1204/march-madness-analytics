@@ -88,10 +88,12 @@ def step_simulate(**kwargs):
     if refit is not None:
         print("\n--- Re-fitting models ---")
         try:
-            refit(tournament_weight=tournament_weight)
+            refit_result = refit(tournament_weight=tournament_weight)
         except Exception as exc:
+            refit_result = None
             print(f"[WARN] refit_models failed: {exc}")
     else:
+        refit_result = None
         print("[SKIP] refresh.refit_models not available")
 
     # 2. Re-execute the notebook (unless --no-notebook)
@@ -125,6 +127,11 @@ def step_simulate(**kwargs):
         else:
             print("[SKIP] Notebook not found")
     else:
+        if refit_result is not None:
+            print(
+                "[NOTE] Refitted models available but --no-notebook skips simulation. "
+                "Re-run without --no-notebook to apply refitted models."
+            )
         print("[SKIP] Notebook execution disabled (--no-notebook)")
 
 

@@ -175,7 +175,8 @@ def _compute_composite_adjustments(
         delta = actual_margin - exp
         team_deltas.setdefault(team, []).append(delta)
 
-    scale = tournament_weight / 5.0
+    from scripts.quant_models import ADJUSTMENT_SCALE_DIVISOR
+    scale = tournament_weight / ADJUSTMENT_SCALE_DIVISOR
     adjustments = {}
     for team, deltas in team_deltas.items():
         avg_delta = sum(deltas) / len(deltas)
@@ -285,7 +286,7 @@ def refit_models(
         "garch": garch,
         "hmm": hmm,
         "kalman": kalman,
-        "composite_adjustments": composite_adjustments,
+        "tournament_adjustments": composite_adjustments,
     }
 
 
