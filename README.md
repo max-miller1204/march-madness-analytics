@@ -9,12 +9,34 @@ A live tournament prediction pipeline that generates a full 63-game bracket, tra
 
 | Metric | Value |
 |--------|-------|
-| Games tracked | 14 |
-| Correct picks | 9/14 |
-| Accuracy | 64.3% |
-| Upsets caught | 0/5 |
+| Games tracked | 15 |
+| Correct picks | 9/15 |
+| Accuracy | 60.0% |
+| Upsets caught | 0/6 |
 
 ![Accuracy Dashboard](images/accuracy_dashboard.png)
+
+### Game-by-Game Results
+
+| Game | Matchup | Score | Winner | Our Pick | Confidence | Result |
+|------|---------|-------|--------|----------|------------|--------|
+| E1 | (1) Duke vs (16) Siena | 71-65 | Duke | Duke | 98.4% | Correct |
+| E6 | (3) Michigan St. vs (14) N. Dakota St. | 92-67 | Michigan State | Michigan State | 91.9% | Correct |
+| E5 | (6) Louisville vs (11) South Florida | 83-79 | Louisville | Louisville | 73.0% | Correct |
+| E2 | (8) Ohio State vs (9) TCU | 64-66 | TCU | Ohio State | 61.7% | Wrong |
+| M1 | (1) Michigan vs (16) Howard | 101-80 | Michigan | Michigan | 92.9% | Correct |
+| M2 | (8) Georgia vs (9) Saint Louis | 77-102 | Saint Louis | Georgia | 56.4% | Wrong |
+| S8 | (2) Houston vs (15) Idaho | 78-47 | Houston | Houston | 96.8% | Correct |
+| S6 | (3) Illinois vs (14) Penn | 105-70 | Illinois | Illinois | 96.1% | Correct |
+| S4 | (4) Nebraska vs (13) Troy | 76-47 | Nebraska | Nebraska | 93.1% | Correct |
+| S3 | (5) Vanderbilt vs (12) McNeese | 78-68 | Vanderbilt | Vanderbilt | 82.8% | Correct |
+| S7 | (7) Saint Mary's vs (10) Texas A&M | 50-63 | Texas A&M | Saint Mary's | 60.7% | Wrong |
+| S5 | (6) North Carolina vs (11) VCU | 78-82 | VCU | North Carolina | 59.7% | Wrong |
+| W4 | (4) Arkansas vs (13) Hawaii | 97-78 | Arkansas | Arkansas | 89.3% | Correct |
+| W3 | (5) Wisconsin vs (12) High Point | 82-83 | High Point | Wisconsin | 82.9% | Wrong |
+| W5 | (6) BYU vs (11) Texas | 71-79 | Texas | BYU | 50.9% | Wrong |
+
+**Record: 9/15 (60.0%) | Upsets caught: 0/6 | All misses were upsets**
 <!-- ACCURACY_END -->
 
 ## How It Works
