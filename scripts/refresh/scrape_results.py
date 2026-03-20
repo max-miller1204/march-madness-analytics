@@ -326,118 +326,180 @@ def _extract_espn_json(soup):
                     return data.get("events", [])
                 except (json.JSONDecodeError, TypeError):
                     pass
-        # window['__espnfitt__'] pattern
+        # window['__espnfitt__'] pattern — contains a large JSON blob
         if "__espnfitt__" in text:
-            match = re.search(r"__espnfitt__['\"]]\s*=\s*(\{.*?\});", text, re.DOTALL)
+            match = re.search(r"window\['__espnfitt__'\]\s*=\s*(\{.*)", text, re.DOTALL)
             if match:
                 try:
-                    data = json.loads(match.group(1))
-                    events = (
-                        data.get("page", {})
-                        .get("content", {})
-                        .get("scoreboard", {})
-                        .get("evts", [])
-                    )
-                    return events if events else None
+                    raw = match.group(1)
+                    # Find matching closing brace by tracking depth
+                    depth = 0
+                    end = 0
+                    for i, c in enumerate(raw):
+                        if c == "{":
+                            depth += 1
+                        elif c == "}":
+                            depth -= 1
+                        if depth == 0:
+                            end = i + 1
+                            break
+                    if end > 0:
+                        data = json.loads(raw[:end])
+                        events = (
+                            data.get("page", {})
+                            .get("content", {})
+                            .get("scoreboard", {})
+                            .get("evts", [])
+                        )
+                        return events if events else None
                 except (json.JSONDecodeError, TypeError, AttributeError):
                     pass
     return None
 
 
 def _parse_from_json(events, bracket_teams, bracket_games, seen_ids):
-    """Parse completed games from ESPN's embedded JSON event list."""
+    """Parse completed games from ESPN's embedded JSON event list.
+
+    Supports two ESPN JSON formats:
+      1. scoreboardData: events[].competitions[].competitors[].team.location
+      2. __espnfitt__:   evts[].competitors[].location  (flat structure)
+    """
     completed = []
     for event in events:
+        # --- Determine format and extract competitor info ---
         competitions = event.get("competitions", [])
-        for comp in competitions:
-            status_obj = comp.get("status", {})
-            status_type = status_obj.get("type", {})
-            if not status_type.get("completed", False):
-                continue
-
-            competitors = comp.get("competitors", [])
-            if len(competitors) < 2:
-                continue
-
-            teams_info = []
-            for c in competitors:
-                team_obj = c.get("team", {})
-                name = (
-                    team_obj.get("location")
-                    or team_obj.get("shortDisplayName")
-                    or team_obj.get("displayName")
-                    or team_obj.get("name", "")
+        if competitions:
+            # Format 1: scoreboardData — competitions wrapper
+            for comp in competitions:
+                result = _parse_competition(
+                    comp, bracket_teams, bracket_games, seen_ids, fmt="scoreboardData"
                 )
-                seed_str = c.get("curatedRank", {}).get("current", "")
-                try:
-                    seed = int(seed_str)
-                except (ValueError, TypeError):
-                    seed = 0
-                try:
-                    score = int(c.get("score", "0"))
-                except (ValueError, TypeError):
-                    score = 0
-                teams_info.append({"name": name, "seed": seed, "score": score})
-
-            if len(teams_info) < 2:
+                if result:
+                    completed.append(result)
+        else:
+            # Format 2: __espnfitt__ — flat event structure
+            if not event.get("completed", False):
                 continue
-
-            t1, t2 = teams_info[0], teams_info[1]
-            name_a = _resolve_espn_name(t1["name"], bracket_teams)
-            name_b = _resolve_espn_name(t2["name"], bracket_teams)
-
-            if not name_a or not name_b:
-                logger.debug(
-                    "Skipping game: could not resolve %s vs %s",
-                    t1["name"],
-                    t2["name"],
-                )
-                continue
-
-            score_a, score_b = t1["score"], t2["score"]
-            if score_a <= 0 or score_b <= 0:
-                continue
-
-            winner = name_a if score_a > score_b else name_b
-
-            game_id = _find_game_id(name_a, name_b, bracket_games, seen_ids)
-            if game_id in seen_ids:
-                continue
-            seen_ids.add(game_id)
-
-            round_text = status_obj.get("type", {}).get("description", "")
-            game_round = _detect_round(round_text)
-
-            # Determine region from bracket games
-            region = ""
-            for row in bracket_games:
-                for col in ("TeamA", "TeamB"):
-                    raw = row[col].strip()
-                    expanded = PLAYIN_TEAMS.get(raw, [raw])
-                    if name_a in expanded or name_b in expanded:
-                        region = row.get("Region", "").strip()
-                        break
-                if region:
-                    break
-
-            completed.append(
-                {
-                    "game_id": game_id,
-                    "round": game_round,
-                    "region": region,
-                    "seed_a": t1["seed"],
-                    "team_a": name_a,
-                    "seed_b": t2["seed"],
-                    "team_b": name_b,
-                    "score_a": score_a,
-                    "score_b": score_b,
-                    "winner": winner,
-                    "margin": abs(score_a - score_b),
-                    "completed_at": datetime.now(timezone.utc).isoformat(),
-                }
+            result = _parse_competition(
+                event, bracket_teams, bracket_games, seen_ids, fmt="espnfitt"
             )
+            if result:
+                completed.append(result)
 
     return completed
+
+
+def _parse_competition(comp, bracket_teams, bracket_games, seen_ids, fmt="scoreboardData"):
+    """Parse a single competition/event into a completed-game dict.
+
+    Args:
+        comp: dict — either a competition (scoreboardData) or event (espnfitt)
+        fmt: "scoreboardData" or "espnfitt"
+
+    Returns:
+        dict or None
+    """
+    # --- Check completion ---
+    if fmt == "scoreboardData":
+        status_obj = comp.get("status", {})
+        status_type = status_obj.get("type", {})
+        if not status_type.get("completed", False):
+            return None
+        round_text = status_type.get("description", "")
+    else:
+        # espnfitt: completed already checked by caller
+        status_obj = comp.get("status", {})
+        round_text = status_obj.get("description", "") if isinstance(status_obj, dict) else ""
+
+    competitors = comp.get("competitors", [])
+    if len(competitors) < 2:
+        return None
+
+    teams_info = []
+    for c in competitors:
+        if fmt == "scoreboardData":
+            team_obj = c.get("team", {})
+            name = (
+                team_obj.get("location")
+                or team_obj.get("shortDisplayName")
+                or team_obj.get("displayName")
+                or team_obj.get("name", "")
+            )
+            seed_str = c.get("curatedRank", {}).get("current", "")
+        else:
+            # espnfitt: flat structure
+            name = (
+                c.get("location")
+                or c.get("shortDisplayName")
+                or c.get("displayName")
+                or c.get("name", "")
+            )
+            seed_str = c.get("rank", "")
+
+        try:
+            seed = int(seed_str)
+        except (ValueError, TypeError):
+            seed = 0
+        try:
+            score = int(c.get("score", "0"))
+        except (ValueError, TypeError):
+            score = 0
+        teams_info.append({"name": name, "seed": seed, "score": score})
+
+    if len(teams_info) < 2:
+        return None
+
+    t1, t2 = teams_info[0], teams_info[1]
+    name_a = _resolve_espn_name(t1["name"], bracket_teams)
+    name_b = _resolve_espn_name(t2["name"], bracket_teams)
+
+    if not name_a or not name_b:
+        logger.debug(
+            "Skipping game: could not resolve %s vs %s",
+            t1["name"],
+            t2["name"],
+        )
+        return None
+
+    score_a, score_b = t1["score"], t2["score"]
+    if score_a <= 0 or score_b <= 0:
+        return None
+
+    winner = name_a if score_a > score_b else name_b
+
+    game_id = _find_game_id(name_a, name_b, bracket_games, seen_ids)
+    if game_id in seen_ids:
+        return None
+    seen_ids.add(game_id)
+
+    game_round = _detect_round(round_text)
+
+    # Determine region from bracket games
+    region = ""
+    for row in bracket_games:
+        for col in ("TeamA", "TeamB"):
+            raw = row[col].strip()
+            expanded = PLAYIN_TEAMS.get(raw, [raw])
+            if name_a in expanded or name_b in expanded:
+                region = row.get("Region", "").strip()
+                break
+        if region:
+            break
+
+    return {
+        "game_id": game_id,
+        "round": game_round,
+        "region": region,
+        "seed_a": t1["seed"],
+        "team_a": name_a,
+        "seed_b": t2["seed"],
+        "team_b": name_b,
+        "score_a": score_a,
+        "score_b": score_b,
+        "winner": winner,
+        "margin": abs(score_a - score_b),
+        "completed_at": datetime.now(timezone.utc).isoformat(),
+    }
 
 
 def _parse_from_html(soup, bracket_teams, bracket_games, seen_ids):

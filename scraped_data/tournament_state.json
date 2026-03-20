@@ -1,202 +1,202 @@
 {
-  "last_updated": "2026-03-20T01:50:30.488808+00:00",
+  "last_updated": "2026-03-20T01:58:03.988714+00:00",
   "current_round": "Round of 64",
   "completed_games": [
     {
-      "game_id": "S5",
-      "round": "Round of 64",
-      "region": "South",
-      "seed_a": 11,
-      "team_a": "VCU",
-      "seed_b": 6,
-      "team_b": "North Carolina",
-      "score_a": 18,
-      "score_b": 24,
-      "winner": "North Carolina",
-      "margin": 6,
-      "completed_at": "2026-03-19T23:19:35.137336+00:00"
+      "game_id": "W5",
+      "round": "Championship",
+      "region": "West",
+      "seed_a": 6,
+      "team_a": "BYU",
+      "seed_b": 11,
+      "team_b": "Texas",
+      "score_a": 71,
+      "score_b": 79,
+      "winner": "Texas",
+      "margin": 8,
+      "completed_at": "2026-03-20T01:58:03.988653+00:00"
     },
     {
       "game_id": "E1",
-      "round": "Round of 64",
+      "round": "Championship",
       "region": "East",
-      "seed_a": 16,
-      "team_a": "Siena",
-      "seed_b": 1,
-      "team_b": "Duke",
-      "score_a": 65,
-      "score_b": 71,
+      "seed_a": 1,
+      "team_a": "Duke",
+      "seed_b": 16,
+      "team_b": "Siena",
+      "score_a": 71,
+      "score_b": 65,
       "winner": "Duke",
       "margin": 6,
-      "completed_at": "2026-03-19T23:19:35.137353+00:00"
-    },
-    {
-      "game_id": "E6",
-      "round": "Round of 64",
-      "region": "East",
-      "seed_a": 14,
-      "team_a": "North Dakota State",
-      "seed_b": 3,
-      "team_b": "Michigan State",
-      "score_a": 67,
-      "score_b": 92,
-      "winner": "Michigan State",
-      "margin": 25,
-      "completed_at": "2026-03-19T23:19:35.137357+00:00"
-    },
-    {
-      "game_id": "S4",
-      "round": "Round of 64",
-      "region": "South",
-      "seed_a": 13,
-      "team_a": "Troy",
-      "seed_b": 4,
-      "team_b": "Nebraska",
-      "score_a": 47,
-      "score_b": 76,
-      "winner": "Nebraska",
-      "margin": 29,
-      "completed_at": "2026-03-19T23:19:35.137360+00:00"
-    },
-    {
-      "game_id": "W4",
-      "round": "Round of 64",
-      "region": "West",
-      "seed_a": 13,
-      "team_a": "Hawaii",
-      "seed_b": 4,
-      "team_b": "Arkansas",
-      "score_a": 78,
-      "score_b": 97,
-      "winner": "Arkansas",
-      "margin": 19,
-      "completed_at": "2026-03-19T23:19:35.137362+00:00"
-    },
-    {
-      "game_id": "W3",
-      "round": "Round of 64",
-      "region": "West",
-      "seed_a": 12,
-      "team_a": "High Point",
-      "seed_b": 5,
-      "team_b": "Wisconsin",
-      "score_a": 83,
-      "score_b": 82,
-      "winner": "High Point",
-      "margin": 1,
-      "completed_at": "2026-03-19T23:19:35.137366+00:00"
-    },
-    {
-      "game_id": "S3",
-      "round": "Round of 64",
-      "region": "South",
-      "seed_a": 12,
-      "team_a": "McNeese",
-      "seed_b": 5,
-      "team_b": "Vanderbilt",
-      "score_a": 68,
-      "score_b": 78,
-      "winner": "Vanderbilt",
-      "margin": 10,
-      "completed_at": "2026-03-19T23:19:35.137368+00:00"
-    },
-    {
-      "game_id": "E5",
-      "round": "Round of 64",
-      "region": "East",
-      "seed_a": 11,
-      "team_a": "South Florida",
-      "seed_b": 6,
-      "team_b": "Louisville",
-      "score_a": 79,
-      "score_b": 83,
-      "winner": "Louisville",
-      "margin": 4,
-      "completed_at": "2026-03-19T23:19:35.137371+00:00"
-    },
-    {
-      "game_id": "E2",
-      "round": "Round of 64",
-      "region": "East",
-      "seed_a": 9,
-      "team_a": "TCU",
-      "seed_b": 8,
-      "team_b": "Ohio State",
-      "score_a": 66,
-      "score_b": 64,
-      "winner": "TCU",
-      "margin": 2,
-      "completed_at": "2026-03-19T23:19:35.137373+00:00"
-    },
-    {
-      "game_id": "M5",
-      "round": "Round of 64",
-      "region": "Midwest",
-      "seed_a": 11,
-      "team_a": "Miami (OH)",
-      "seed_b": 11,
-      "team_b": "SMU",
-      "score_a": 89,
-      "score_b": 79,
-      "winner": "Miami (OH)",
-      "margin": 10,
-      "completed_at": "2026-03-19T23:19:35.137376+00:00"
-    },
-    {
-      "game_id": "S1",
-      "round": "Round of 64",
-      "region": "South",
-      "seed_a": 16,
-      "team_a": "Prairie View A&M",
-      "seed_b": 16,
-      "team_b": "Lehigh",
-      "score_a": 67,
-      "score_b": 55,
-      "winner": "Prairie View A&M",
-      "margin": 12,
-      "completed_at": "2026-03-19T23:19:35.137378+00:00"
-    },
-    {
-      "game_id": "W5",
-      "round": "Round of 64",
-      "region": "West",
-      "seed_a": 11,
-      "team_a": "Texas",
-      "seed_b": 11,
-      "team_b": "NC State",
-      "score_a": 68,
-      "score_b": 66,
-      "winner": "Texas",
-      "margin": 2,
-      "completed_at": "2026-03-19T23:19:35.137381+00:00"
+      "completed_at": "2026-03-20T01:58:03.988674+00:00"
     },
     {
       "game_id": "M1",
       "round": "Championship",
       "region": "Midwest",
-      "seed_a": 16,
-      "team_a": "UMBC",
+      "seed_a": 1,
+      "team_a": "Michigan",
       "seed_b": 16,
       "team_b": "Howard",
+      "score_a": 101,
+      "score_b": 80,
+      "winner": "Michigan",
+      "margin": 21,
+      "completed_at": "2026-03-20T01:58:03.988680+00:00"
+    },
+    {
+      "game_id": "E6",
+      "round": "Championship",
+      "region": "East",
+      "seed_a": 3,
+      "team_a": "Michigan State",
+      "seed_b": 14,
+      "team_b": "North Dakota State",
+      "score_a": 92,
+      "score_b": 67,
+      "winner": "Michigan State",
+      "margin": 25,
+      "completed_at": "2026-03-20T01:58:03.988684+00:00"
+    },
+    {
+      "game_id": "S4",
+      "round": "Championship",
+      "region": "South",
+      "seed_a": 4,
+      "team_a": "Nebraska",
+      "seed_b": 13,
+      "team_b": "Troy",
+      "score_a": 76,
+      "score_b": 47,
+      "winner": "Nebraska",
+      "margin": 29,
+      "completed_at": "2026-03-20T01:58:03.988687+00:00"
+    },
+    {
+      "game_id": "W4",
+      "round": "Championship",
+      "region": "West",
+      "seed_a": 4,
+      "team_a": "Arkansas",
+      "seed_b": 13,
+      "team_b": "Hawaii",
+      "score_a": 97,
+      "score_b": 78,
+      "winner": "Arkansas",
+      "margin": 19,
+      "completed_at": "2026-03-20T01:58:03.988689+00:00"
+    },
+    {
+      "game_id": "W3",
+      "round": "Championship",
+      "region": "West",
+      "seed_a": 5,
+      "team_a": "Wisconsin",
+      "seed_b": 12,
+      "team_b": "High Point",
+      "score_a": 82,
+      "score_b": 83,
+      "winner": "High Point",
+      "margin": 1,
+      "completed_at": "2026-03-20T01:58:03.988692+00:00"
+    },
+    {
+      "game_id": "S3",
+      "round": "Championship",
+      "region": "South",
+      "seed_a": 5,
+      "team_a": "Vanderbilt",
+      "seed_b": 12,
+      "team_b": "McNeese",
+      "score_a": 78,
+      "score_b": 68,
+      "winner": "Vanderbilt",
+      "margin": 10,
+      "completed_at": "2026-03-20T01:58:03.988695+00:00"
+    },
+    {
+      "game_id": "E5",
+      "round": "Championship",
+      "region": "East",
+      "seed_a": 6,
+      "team_a": "Louisville",
+      "seed_b": 11,
+      "team_b": "South Florida",
       "score_a": 83,
-      "score_b": 86,
-      "winner": "Howard",
-      "margin": 3,
-      "completed_at": "2026-03-19T23:19:35.137383+00:00"
+      "score_b": 79,
+      "winner": "Louisville",
+      "margin": 4,
+      "completed_at": "2026-03-20T01:58:03.988697+00:00"
+    },
+    {
+      "game_id": "S5",
+      "round": "Championship",
+      "region": "South",
+      "seed_a": 6,
+      "team_a": "North Carolina",
+      "seed_b": 11,
+      "team_b": "VCU",
+      "score_a": 78,
+      "score_b": 82,
+      "winner": "VCU",
+      "margin": 4,
+      "completed_at": "2026-03-20T01:58:03.988700+00:00"
     },
     {
       "game_id": "S7",
-      "round": "Round of 64",
+      "round": "Championship",
       "region": "South",
-      "seed_a": 10,
-      "team_a": "Texas A&M",
-      "seed_b": 7,
-      "team_b": "Saint Mary's",
-      "score_a": 63,
-      "score_b": 50,
+      "seed_a": 7,
+      "team_a": "Saint Mary's",
+      "seed_b": 10,
+      "team_b": "Texas A&M",
+      "score_a": 50,
+      "score_b": 63,
       "winner": "Texas A&M",
       "margin": 13,
-      "completed_at": "2026-03-20T01:44:44.125323+00:00"
+      "completed_at": "2026-03-20T01:58:03.988703+00:00"
+    },
+    {
+      "game_id": "E2",
+      "round": "Championship",
+      "region": "East",
+      "seed_a": 8,
+      "team_a": "Ohio State",
+      "seed_b": 9,
+      "team_b": "TCU",
+      "score_a": 64,
+      "score_b": 66,
+      "winner": "TCU",
+      "margin": 2,
+      "completed_at": "2026-03-20T01:58:03.988705+00:00"
+    },
+    {
+      "game_id": "M5",
+      "round": "Championship",
+      "region": "Midwest",
+      "seed_a": 11,
+      "team_a": "SMU",
+      "seed_b": 11,
+      "team_b": "Miami (OH)",
+      "score_a": 79,
+      "score_b": 89,
+      "winner": "Miami (OH)",
+      "margin": 10,
+      "completed_at": "2026-03-20T01:58:03.988708+00:00"
+    },
+    {
+      "game_id": "S1",
+      "round": "Championship",
+      "region": "South",
+      "seed_a": 16,
+      "team_a": "Lehigh",
+      "seed_b": 16,
+      "team_b": "Prairie View A&M",
+      "score_a": 55,
+      "score_b": 67,
+      "winner": "Prairie View A&M",
+      "margin": 12,
+      "completed_at": "2026-03-20T01:58:03.988711+00:00"
     }
   ],
   "predictions_at_time": {
@@ -529,45 +529,65 @@
     }
   },
   "eliminated_teams": [
-    "UMBC",
-    "McNeese",
+    "BYU",
     "Siena",
+    "Howard",
+    "North Dakota State",
     "Troy",
+    "Hawaii",
     "Wisconsin",
+    "McNeese",
     "South Florida",
+    "North Carolina",
+    "Saint Mary's",
     "Ohio State",
     "SMU",
-    "Lehigh",
-    "NC State",
-    "North Dakota State",
-    "VCU",
-    "Hawaii",
-    "Saint Mary's"
+    "Lehigh"
   ],
   "advancing_teams": {
-    "M1": {
-      "team": "Howard",
-      "seed": 16
-    },
-    "S3": {
-      "team": "Vanderbilt",
-      "seed": 5
+    "W5": {
+      "team": "Texas",
+      "seed": 11
     },
     "E1": {
       "team": "Duke",
       "seed": 1
     },
+    "M1": {
+      "team": "Michigan",
+      "seed": 1
+    },
+    "E6": {
+      "team": "Michigan State",
+      "seed": 3
+    },
     "S4": {
       "team": "Nebraska",
+      "seed": 4
+    },
+    "W4": {
+      "team": "Arkansas",
       "seed": 4
     },
     "W3": {
       "team": "High Point",
       "seed": 12
     },
+    "S3": {
+      "team": "Vanderbilt",
+      "seed": 5
+    },
     "E5": {
       "team": "Louisville",
       "seed": 6
+    },
+    "S5": {
+      "team": "VCU",
+      "seed": 11
+    },
+    "S7": {
+      "team": "Texas A&M",
+      "seed": 10
     },
     "E2": {
       "team": "TCU",
@@ -580,26 +600,6 @@
     "S1": {
       "team": "Prairie View A&M",
       "seed": 16
-    },
-    "W5": {
-      "team": "Texas",
-      "seed": 11
-    },
-    "E6": {
-      "team": "Michigan State",
-      "seed": 3
-    },
-    "S5": {
-      "team": "North Carolina",
-      "seed": 6
-    },
-    "W4": {
-      "team": "Arkansas",
-      "seed": 4
-    },
-    "S7": {
-      "team": "Texas A&M",
-      "seed": 10
     }
   }
 }
