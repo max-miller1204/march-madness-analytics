@@ -703,6 +703,13 @@ class EVOptimizedSimulator:
             net_a = net_a + adj_a * 0.3
             net_b = net_b + adj_b * 0.3
 
+        # Kalman momentum adjustment
+        if self.kalman is not None:
+            mom_a = self.kalman.get_normalized_momentum(team_a)
+            mom_b = self.kalman.get_normalized_momentum(team_b)
+            net_a = net_a + (mom_a - 50) * 0.15
+            net_b = net_b + (mom_b - 50) * 0.15
+
         margin = (net_a - net_b) / 2
 
         # GARCH combined volatility
@@ -965,6 +972,13 @@ class QuantEnhancedSimulator:
             # Scale down HMM adjustments to avoid dominating
             net_a = net_a + adj_a * 0.3
             net_b = net_b + adj_b * 0.3
+
+        # Kalman momentum adjustment
+        if self.kalman is not None:
+            mom_a = self.kalman.get_normalized_momentum(team_a)
+            mom_b = self.kalman.get_normalized_momentum(team_b)
+            net_a = net_a + (mom_a - 50) * 0.15
+            net_b = net_b + (mom_b - 50) * 0.15
 
         # Base win probability
         margin = (net_a - net_b) / 2
