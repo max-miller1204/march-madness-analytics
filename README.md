@@ -5,13 +5,13 @@ A live tournament prediction pipeline that generates a full 63-game bracket, tra
 <!-- ACCURACY_START -->
 ## Tournament Accuracy Tracker
 
-*Last updated: 2026-03-20T04:37:59Z*
+*Last updated: 2026-03-20T04:56:04Z*
 
 | Metric | Value |
 |--------|-------|
-| Games tracked | 15 |
-| Correct picks | 9/15 |
-| Accuracy | 60.0% |
+| Games tracked | 16 |
+| Correct picks | 10/16 |
+| Accuracy | 62.5% |
 | Upsets caught | 0/6 |
 
 ![Accuracy Dashboard](images/accuracy_dashboard.png)
@@ -32,11 +32,12 @@ A live tournament prediction pipeline that generates a full 63-game bracket, tra
 | S3 | (5) Vanderbilt vs (12) McNeese | 78-68 | Vanderbilt | Vanderbilt | 82.8% | Correct |
 | S7 | (7) Saint Mary's vs (10) Texas A&M | 50-63 | Texas A&M | Saint Mary's | 60.7% | Wrong |
 | S5 | (6) North Carolina vs (11) VCU | 78-82 | VCU | North Carolina | 59.7% | Wrong |
+| W6 | (3) Gonzaga vs (14) Kennesaw State | 73-64 | Gonzaga | Gonzaga | 94.8% | Correct |
 | W4 | (4) Arkansas vs (13) Hawaii | 97-78 | Arkansas | Arkansas | 89.3% | Correct |
 | W3 | (5) Wisconsin vs (12) High Point | 82-83 | High Point | Wisconsin | 82.9% | Wrong |
 | W5 | (6) BYU vs (11) Texas | 71-79 | Texas | BYU | 50.9% | Wrong |
 
-**Record: 9/15 (60.0%) | Upsets caught: 0/6 | All misses were upsets**
+**Record: 10/16 (62.5%) | Upsets caught: 0/6 | All misses were upsets**
 <!-- ACCURACY_END -->
 
 ## How It Works
