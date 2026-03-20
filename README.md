@@ -5,14 +5,14 @@ A live tournament prediction pipeline that generates a full 63-game bracket, tra
 <!-- ACCURACY_START -->
 ## Tournament Accuracy Tracker
 
-*Last updated: 2026-03-20T01:51:29Z*
+*Last updated: 2026-03-20T02:03:17Z*
 
 | Metric | Value |
 |--------|-------|
-| Games tracked | 10 |
-| Correct picks | 7/10 |
-| Accuracy | 70.0% |
-| Upsets caught | 0/3 |
+| Games tracked | 11 |
+| Correct picks | 7/11 |
+| Accuracy | 63.6% |
+| Upsets caught | 0/4 |
 
 ![Accuracy Dashboard](images/accuracy_dashboard.png)
 <!-- ACCURACY_END -->

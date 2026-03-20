@@ -1989,6 +1989,131 @@
         "total_ev_predicted": 120.61,
         "total_ev_actual": 380.0
       }
+    },
+    {
+      "timestamp": "2026-03-20T02:03:17Z",
+      "round": "Round of 64",
+      "games_completed": 11,
+      "predictions": [
+        {
+          "game_id": "E1",
+          "predicted_winner": "Duke",
+          "predicted_prob": 0.9842,
+          "actual_winner": "Duke",
+          "correct": true,
+          "ev_predicted": 9.84,
+          "ev_actual": 10,
+          "upset": false
+        },
+        {
+          "game_id": "E6",
+          "predicted_winner": "Michigan State",
+          "predicted_prob": 0.9186,
+          "actual_winner": "Michigan State",
+          "correct": true,
+          "ev_predicted": 9.19,
+          "ev_actual": 10,
+          "upset": false
+        },
+        {
+          "game_id": "E5",
+          "predicted_winner": "Louisville",
+          "predicted_prob": 0.7295,
+          "actual_winner": "Louisville",
+          "correct": true,
+          "ev_predicted": 7.29,
+          "ev_actual": 10,
+          "upset": false
+        },
+        {
+          "game_id": "E2",
+          "predicted_winner": "Ohio State",
+          "predicted_prob": 0.6165,
+          "actual_winner": "TCU",
+          "correct": false,
+          "ev_predicted": 6.17,
+          "ev_actual": 0.0,
+          "upset": true
+        },
+        {
+          "game_id": "S4",
+          "predicted_winner": "Nebraska",
+          "predicted_prob": 0.9311,
+          "actual_winner": "Nebraska",
+          "correct": true,
+          "ev_predicted": 9.31,
+          "ev_actual": 10,
+          "upset": false
+        },
+        {
+          "game_id": "S3",
+          "predicted_winner": "Vanderbilt",
+          "predicted_prob": 0.8278,
+          "actual_winner": "Vanderbilt",
+          "correct": true,
+          "ev_predicted": 8.28,
+          "ev_actual": 10,
+          "upset": false
+        },
+        {
+          "game_id": "S7",
+          "predicted_winner": "Saint Mary's",
+          "predicted_prob": 0.6069,
+          "actual_winner": "Texas A&M",
+          "correct": false,
+          "ev_predicted": 6.07,
+          "ev_actual": 0.0,
+          "upset": true
+        },
+        {
+          "game_id": "S5",
+          "predicted_winner": "North Carolina",
+          "predicted_prob": 0.5965,
+          "actual_winner": "VCU",
+          "correct": false,
+          "ev_predicted": 5.96,
+          "ev_actual": 0.0,
+          "upset": true
+        },
+        {
+          "game_id": "W4",
+          "predicted_winner": "Arkansas",
+          "predicted_prob": 0.8926,
+          "actual_winner": "Arkansas",
+          "correct": true,
+          "ev_predicted": 8.93,
+          "ev_actual": 10,
+          "upset": false
+        },
+        {
+          "game_id": "W3",
+          "predicted_winner": "Wisconsin",
+          "predicted_prob": 0.8286,
+          "actual_winner": "High Point",
+          "correct": false,
+          "ev_predicted": 8.29,
+          "ev_actual": 0.0,
+          "upset": true
+        },
+        {
+          "game_id": "E1",
+          "predicted_winner": "Duke",
+          "predicted_prob": 0.129,
+          "actual_winner": "Duke",
+          "correct": true,
+          "ev_predicted": 41.28,
+          "ev_actual": 320,
+          "upset": false
+        }
+      ],
+      "summary": {
+        "accuracy": 0.6364,
+        "brier_score": 0.2432,
+        "upsets_predicted_correctly": 0,
+        "upsets_missed": 4,
+        "total_ev_predicted": 120.61,
+        "total_ev_actual": 380.0
+      }
     }
   ]
 }
