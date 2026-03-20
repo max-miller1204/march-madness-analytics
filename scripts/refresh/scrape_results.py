@@ -246,10 +246,10 @@ def _find_game_id(team_a, team_b, bracket_games, existing_ids):
 def _detect_round(game_status_text):
     """Infer tournament round from ESPN game status / context text."""
     text = (game_status_text or "").lower()
-    if "championship" in text or "final" in text:
-        return "Championship"
     if "final four" in text or "semifinal" in text:
         return "Final Four"
+    if "championship" in text or "national final" in text:
+        return "Championship"
     if "elite" in text:
         return "Elite Eight"
     if "sweet" in text:
