@@ -5,7 +5,7 @@ A live tournament prediction pipeline that generates a full 63-game bracket, tra
 <!-- ACCURACY_START -->
 ## Tournament Accuracy Tracker
 
-*Last updated: 2026-03-20T04:24:53Z*
+*Last updated: 2026-03-20T04:37:59Z*
 
 | Metric | Value |
 |--------|-------|
@@ -21,7 +21,7 @@ A live tournament prediction pipeline that generates a full 63-game bracket, tra
 | Game | Matchup | Score | Winner | Our Pick | Confidence | Result |
 |------|---------|-------|--------|----------|------------|--------|
 | E1 | (1) Duke vs (16) Siena | 71-65 | Duke | Duke | 98.4% | Correct |
-| E6 | (3) Michigan St. vs (14) N. Dakota St. | 92-67 | Michigan State | Michigan State | 91.9% | Correct |
+| E6 | (3) Michigan State vs (14) North Dakota State | 92-67 | Michigan State | Michigan State | 91.9% | Correct |
 | E5 | (6) Louisville vs (11) South Florida | 83-79 | Louisville | Louisville | 73.0% | Correct |
 | E2 | (8) Ohio State vs (9) TCU | 64-66 | TCU | Ohio State | 61.7% | Wrong |
 | M1 | (1) Michigan vs (16) Howard | 101-80 | Michigan | Michigan | 92.9% | Correct |
