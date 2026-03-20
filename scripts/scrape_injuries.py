@@ -18,32 +18,7 @@ META_FILE = os.path.join(OUTPUT_DIR, "injuries.meta")
 BRACKET_CSV = os.path.join(OUTPUT_DIR, "bracket.csv")
 TTL_HOURS = 6
 
-# Bracket name -> boydsbets name (reverse of notebook's NAME_ALIASES where needed)
-NAME_ALIASES = {
-    "Michigan St.": "Michigan State",
-    "Iowa St.": "Iowa State",
-    "Ohio St.": "Ohio State",
-    "Connecticut": "UConn",
-    "Utah St.": "Utah State",
-    "Miami FL": "Miami (FL)",
-    "N.C. State": "NC State",
-    "North Dakota St.": "North Dakota State",
-    "Wright St.": "Wright State",
-    "Kennesaw St.": "Kennesaw State",
-    "Miami OH": "Miami (OH)",
-    "Tennessee St.": "Tennessee State",
-    "LIU": "Long Island University",
-    "Queens": "Queens (NC)",
-    "South Fla.": "South Florida",
-    "UNI": "Northern Iowa",
-    "California Baptist": "Cal Baptist",
-    "Saint Mary's (CA)": "Saint Mary's",
-    "St. John's (NY)": "St. John's",
-    "Long Island": "Long Island University",
-    "Saint Mary's College": "Saint Mary's",
-    "Saint John's": "St. John's",
-    "North Carolina State": "NC State",
-}
+from scripts.quant_models import NAME_ALIASES
 
 # Boydsbets team name variants -> standard bracket name
 BOYDS_ALIASES = {

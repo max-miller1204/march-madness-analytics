@@ -40,32 +40,7 @@ ESPN_ID_OVERRIDES = {
     "Queens (NC)": 2511,
 }
 
-# KenPom name -> bracket-standard name (for KenPom normalization)
-NAME_ALIASES = {
-    "Michigan St.": "Michigan State",
-    "Iowa St.": "Iowa State",
-    "Ohio St.": "Ohio State",
-    "Connecticut": "UConn",
-    "Utah St.": "Utah State",
-    "Miami FL": "Miami (FL)",
-    "N.C. State": "NC State",
-    "North Dakota St.": "North Dakota State",
-    "Wright St.": "Wright State",
-    "Kennesaw St.": "Kennesaw State",
-    "Miami OH": "Miami (OH)",
-    "Tennessee St.": "Tennessee State",
-    "LIU": "Long Island University",
-    "Queens": "Queens (NC)",
-    "South Fla.": "South Florida",
-    "UNI": "Northern Iowa",
-    "California Baptist": "Cal Baptist",
-    "Saint Mary's (CA)": "Saint Mary's",
-    "St. John's (NY)": "St. John's",
-    "Long Island": "Long Island University",
-    "Saint Mary's College": "Saint Mary's",
-    "Saint John's": "St. John's",
-    "North Carolina State": "NC State",
-}
+from scripts.quant_models import NAME_ALIASES
 
 # Play-in resolutions
 PLAYIN = {
