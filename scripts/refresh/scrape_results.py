@@ -389,7 +389,9 @@ def _parse_from_json(events, bracket_teams, bracket_games, seen_ids):
     return completed
 
 
-def _parse_competition(comp, bracket_teams, bracket_games, seen_ids, fmt="scoreboardData"):
+def _parse_competition(
+    comp, bracket_teams, bracket_games, seen_ids, fmt="scoreboardData"
+):
     """Parse a single competition/event into a completed-game dict.
 
     Args:
@@ -409,7 +411,9 @@ def _parse_competition(comp, bracket_teams, bracket_games, seen_ids, fmt="scoreb
     else:
         # espnfitt: completed already checked by caller
         status_obj = comp.get("status", {})
-        round_text = status_obj.get("description", "") if isinstance(status_obj, dict) else ""
+        round_text = (
+            status_obj.get("description", "") if isinstance(status_obj, dict) else ""
+        )
 
     competitors = comp.get("competitors", [])
     if len(competitors) < 2:
