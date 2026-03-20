@@ -989,9 +989,7 @@ class QuantEnhancedSimulator:
             net_a = net_a + (mom_a - 50) * KALMAN_SCALE
             net_b = net_b + (mom_b - 50) * KALMAN_SCALE
 
-        # Base win probability
         margin = (net_a - net_b) / 2
-        p_model = 1 / (1 + 10 ** (-margin / DEFAULT_SIGMA))
 
         # GARCH combined volatility
         if self.garch is not None:
@@ -999,9 +997,10 @@ class QuantEnhancedSimulator:
         else:
             combined_vol = DEFAULT_SIGMA
 
-        # Adjust probability with volatility (wider vol → regress to 0.5)
         if combined_vol > 0:
             p_model = 1 / (1 + 10 ** (-margin / combined_vol))
+        else:
+            p_model = 1 / (1 + 10 ** (-margin / DEFAULT_SIGMA))
 
         # Historical prior blending
         if self.prior is not None:
