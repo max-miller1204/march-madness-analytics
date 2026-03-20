@@ -5,14 +5,14 @@ A live tournament prediction pipeline that generates a full 63-game bracket, tra
 <!-- ACCURACY_START -->
 ## Tournament Accuracy Tracker
 
-*Last updated: 2026-03-20T21:33:23Z*
+*Last updated: 2026-03-20T22:32:11Z*
 
 | Metric | Value |
 |--------|-------|
-| Games tracked | 22 |
-| Correct picks | 16/22 |
-| Accuracy | 72.7% |
-| Upsets caught | 0/6 |
+| Games tracked | 23 |
+| Correct picks | 17/23 |
+| Accuracy | 73.9% |
+| Upsets caught | 1/7 |
 
 ![Accuracy Dashboard](images/accuracy_dashboard.png)
 
@@ -42,8 +42,9 @@ A live tournament prediction pipeline that generates a full 63-game bracket, tra
 | W4 | (4) Arkansas vs (13) Hawaii | 97-78 | Arkansas | Arkansas | 89.3% | Correct |
 | W3 | (5) Wisconsin vs (12) High Point | 82-83 | High Point | Wisconsin | 82.9% | Wrong |
 | W5 | (6) BYU vs (11) Texas | 71-79 | Texas | BYU | 50.9% | Wrong |
+| W2 | (8) Villanova vs (9) Utah State | 76-86 | Utah State | Utah State | 51.3% | Correct |
 
-**Record: 16/22 (72.7%) | Upsets caught: 0/6 | All misses were upsets**
+**Record: 17/23 (73.9%) | Upsets caught: 1/7 | All misses were upsets**
 <!-- ACCURACY_END -->
 
 ## How It Works
