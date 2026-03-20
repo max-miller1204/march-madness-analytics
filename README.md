@@ -5,13 +5,13 @@ A live tournament prediction pipeline that generates a full 63-game bracket, tra
 <!-- ACCURACY_START -->
 ## Tournament Accuracy Tracker
 
-*Last updated: 2026-03-20T20:36:26Z*
+*Last updated: 2026-03-20T21:33:23Z*
 
 | Metric | Value |
 |--------|-------|
-| Games tracked | 20 |
-| Correct picks | 14/20 |
-| Accuracy | 70.0% |
+| Games tracked | 22 |
+| Correct picks | 16/22 |
+| Accuracy | 72.7% |
 | Upsets caught | 0/6 |
 
 ![Accuracy Dashboard](images/accuracy_dashboard.png)
@@ -25,7 +25,9 @@ A live tournament prediction pipeline that generates a full 63-game bracket, tra
 | E5 | (6) Louisville vs (11) South Florida | 83-79 | Louisville | Louisville | 73.0% | Correct |
 | E2 | (8) Ohio State vs (9) TCU | 64-66 | TCU | Ohio State | 61.7% | Wrong |
 | M1 | (1) Michigan vs (16) Howard | 101-80 | Michigan | Michigan | 92.9% | Correct |
+| M8 | (2) Iowa State vs (15) Tennessee State | 108-74 | Iowa State | Iowa State | 97.3% | Correct |
 | M6 | (3) Virginia vs (14) Wright State | 82-73 | Virginia | Virginia | 92.9% | Correct |
+| M4 | (4) Alabama vs (13) Hofstra | 90-70 | Alabama | Alabama | 84.7% | Correct |
 | M3 | (12) Akron vs (5) Texas Tech | 3-6 | Texas Tech | Texas Tech | 78.3% | Correct |
 | M2 | (8) Georgia vs (9) Saint Louis | 77-102 | Saint Louis | Georgia | 56.4% | Wrong |
 | M7 | (10) Santa Clara vs (7) Kentucky | 18-23 | Kentucky | Kentucky | 55.0% | Correct |
@@ -41,7 +43,7 @@ A live tournament prediction pipeline that generates a full 63-game bracket, tra
 | W3 | (5) Wisconsin vs (12) High Point | 82-83 | High Point | Wisconsin | 82.9% | Wrong |
 | W5 | (6) BYU vs (11) Texas | 71-79 | Texas | BYU | 50.9% | Wrong |
 
-**Record: 14/20 (70.0%) | Upsets caught: 0/6 | All misses were upsets**
+**Record: 16/22 (72.7%) | Upsets caught: 0/6 | All misses were upsets**
 <!-- ACCURACY_END -->
 
 ## How It Works
