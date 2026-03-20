@@ -50,6 +50,10 @@ REGION_SEED_MAP = {"East": 0, "South": 1, "West": 2, "Midwest": 3}
 
 REGION_PREFIXES = {"East": "E", "South": "S", "West": "W", "Midwest": "M"}
 
+DEFAULT_SIGMA = 11.0  # Fallback combined volatility (empirical average)
+HMM_SCALE = 0.3       # HMM adjustment dampening factor
+KALMAN_SCALE = 0.15    # Kalman momentum adjustment scale
+
 QUAD_WEIGHTS = {
     "Quadrant 1": 1.5,
     "Quadrant 2": 1.2,
@@ -327,13 +331,13 @@ class HierarchicalGARCH:
         self.alpha = 0.1
         self.beta = 0.85
         for team, margins in self.team_margins.items():
-            self.team_sigma[team] = 11.0
+            self.team_sigma[team] = DEFAULT_SIGMA
             self.team_omega[team] = 0.0
 
     def combined_volatility(self, team_a, team_b):
         """Combined volatility for a matchup: sqrt(σ_A² + σ_B²)."""
-        sa = self.team_sigma.get(team_a, 11.0)
-        sb = self.team_sigma.get(team_b, 11.0)
+        sa = self.team_sigma.get(team_a, DEFAULT_SIGMA)
+        sb = self.team_sigma.get(team_b, DEFAULT_SIGMA)
         return np.sqrt(sa**2 + sb**2)
 
 
@@ -705,15 +709,15 @@ class EVOptimizedSimulator:
         if self.hmm is not None:
             adj_a = self.hmm.sample_state_adjustment(team_a, rng)
             adj_b = self.hmm.sample_state_adjustment(team_b, rng)
-            net_a = net_a + adj_a * 0.3
-            net_b = net_b + adj_b * 0.3
+            net_a = net_a + adj_a * HMM_SCALE
+            net_b = net_b + adj_b * HMM_SCALE
 
         # Kalman momentum adjustment
         if self.kalman is not None:
             mom_a = self.kalman.get_normalized_momentum(team_a)
             mom_b = self.kalman.get_normalized_momentum(team_b)
-            net_a = net_a + (mom_a - 50) * 0.15
-            net_b = net_b + (mom_b - 50) * 0.15
+            net_a = net_a + (mom_a - 50) * KALMAN_SCALE
+            net_b = net_b + (mom_b - 50) * KALMAN_SCALE
 
         margin = (net_a - net_b) / 2
 
@@ -721,12 +725,12 @@ class EVOptimizedSimulator:
         if self.garch is not None:
             combined_vol = self.garch.combined_volatility(team_a, team_b)
         else:
-            combined_vol = 11.0
+            combined_vol = DEFAULT_SIGMA
 
         if combined_vol > 0:
             p_model = 1 / (1 + 10 ** (-margin / combined_vol))
         else:
-            p_model = 1 / (1 + 10 ** (-margin / 11))
+            p_model = 1 / (1 + 10 ** (-margin / DEFAULT_SIGMA))
 
         # NO prior blending — pure model probability
         return np.clip(p_model, 0.01, 0.99)
@@ -975,25 +979,25 @@ class QuantEnhancedSimulator:
             adj_a = self.hmm.sample_state_adjustment(team_a, rng)
             adj_b = self.hmm.sample_state_adjustment(team_b, rng)
             # Scale down HMM adjustments to avoid dominating
-            net_a = net_a + adj_a * 0.3
-            net_b = net_b + adj_b * 0.3
+            net_a = net_a + adj_a * HMM_SCALE
+            net_b = net_b + adj_b * HMM_SCALE
 
         # Kalman momentum adjustment
         if self.kalman is not None:
             mom_a = self.kalman.get_normalized_momentum(team_a)
             mom_b = self.kalman.get_normalized_momentum(team_b)
-            net_a = net_a + (mom_a - 50) * 0.15
-            net_b = net_b + (mom_b - 50) * 0.15
+            net_a = net_a + (mom_a - 50) * KALMAN_SCALE
+            net_b = net_b + (mom_b - 50) * KALMAN_SCALE
 
         # Base win probability
         margin = (net_a - net_b) / 2
-        p_model = 1 / (1 + 10 ** (-margin / 11))
+        p_model = 1 / (1 + 10 ** (-margin / DEFAULT_SIGMA))
 
         # GARCH combined volatility
         if self.garch is not None:
             combined_vol = self.garch.combined_volatility(team_a, team_b)
         else:
-            combined_vol = 11.0
+            combined_vol = DEFAULT_SIGMA
 
         # Adjust probability with volatility (wider vol → regress to 0.5)
         if combined_vol > 0:
