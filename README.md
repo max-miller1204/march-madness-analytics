@@ -5,13 +5,13 @@ A live tournament prediction pipeline that generates a full 63-game bracket, tra
 <!-- ACCURACY_START -->
 ## Tournament Accuracy Tracker
 
-*Last updated: 2026-03-21T02:42:27Z*
+*Last updated: 2026-03-21T04:45:35Z*
 
 | Metric | Value |
 |--------|-------|
-| Games tracked | 27 |
-| Correct picks | 21/27 |
-| Accuracy | 77.8% |
+| Games tracked | 29 |
+| Correct picks | 23/29 |
+| Accuracy | 79.3% |
 | Upsets caught | 2/8 |
 
 ![Accuracy Dashboard](images/accuracy_dashboard.png)
@@ -22,6 +22,7 @@ A live tournament prediction pipeline that generates a full 63-game bracket, tra
 |------|---------|-------|--------|----------|------------|--------|
 | E1 | (1) Duke vs (16) Siena | 71-65 | Duke | Duke | 98.4% | Correct |
 | E6 | (3) Michigan State vs (14) North Dakota State | 92-67 | Michigan State | Michigan State | 91.9% | Correct |
+| E4 | (4) Kansas vs (13) Cal Baptist | 68-60 | Kansas | Kansas | 87.2% | Correct |
 | E3 | (5) St. John's vs (12) Northern Iowa | 79-53 | St. John's | St. John's | 81.1% | Correct |
 | E5 | (6) Louisville vs (11) South Florida | 83-79 | Louisville | Louisville | 73.0% | Correct |
 | E7 | (7) UCLA vs (10) UCF | 75-71 | UCLA | UCLA | 67.0% | Correct |
@@ -45,10 +46,11 @@ A live tournament prediction pipeline that generates a full 63-game bracket, tra
 | W6 | (3) Gonzaga vs (14) Kennesaw State | 73-64 | Gonzaga | Gonzaga | 94.8% | Correct |
 | W4 | (4) Arkansas vs (13) Hawaii | 97-78 | Arkansas | Arkansas | 89.3% | Correct |
 | W3 | (5) Wisconsin vs (12) High Point | 82-83 | High Point | Wisconsin | 82.9% | Wrong |
+| W7 | (7) Miami (FL) vs (10) Missouri | 80-66 | Miami (FL) | Miami (FL) | 64.0% | Correct |
 | W5 | (6) BYU vs (11) Texas | 71-79 | Texas | BYU | 50.9% | Wrong |
 | W2 | (8) Villanova vs (9) Utah State | 76-86 | Utah State | Utah State | 51.3% | Correct |
 
-**Record: 21/27 (77.8%) | Upsets caught: 2/8 | All misses were upsets**
+**Record: 23/29 (79.3%) | Upsets caught: 2/8 | All misses were upsets**
 <!-- ACCURACY_END -->
 
 ## How It Works
