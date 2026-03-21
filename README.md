@@ -5,14 +5,14 @@ A live tournament prediction pipeline that generates a full 63-game bracket, tra
 <!-- ACCURACY_START -->
 ## Tournament Accuracy Tracker
 
-*Last updated: 2026-03-20T23:55:56Z*
+*Last updated: 2026-03-21T02:42:27Z*
 
 | Metric | Value |
 |--------|-------|
-| Games tracked | 23 |
-| Correct picks | 17/23 |
-| Accuracy | 73.9% |
-| Upsets caught | 1/7 |
+| Games tracked | 27 |
+| Correct picks | 21/27 |
+| Accuracy | 77.8% |
+| Upsets caught | 2/8 |
 
 ![Accuracy Dashboard](images/accuracy_dashboard.png)
 
@@ -22,7 +22,9 @@ A live tournament prediction pipeline that generates a full 63-game bracket, tra
 |------|---------|-------|--------|----------|------------|--------|
 | E1 | (1) Duke vs (16) Siena | 71-65 | Duke | Duke | 98.4% | Correct |
 | E6 | (3) Michigan State vs (14) North Dakota State | 92-67 | Michigan State | Michigan State | 91.9% | Correct |
+| E3 | (5) St. John's vs (12) Northern Iowa | 79-53 | St. John's | St. John's | 81.1% | Correct |
 | E5 | (6) Louisville vs (11) South Florida | 83-79 | Louisville | Louisville | 73.0% | Correct |
+| E7 | (7) UCLA vs (10) UCF | 75-71 | UCLA | UCLA | 67.0% | Correct |
 | E2 | (8) Ohio State vs (9) TCU | 64-66 | TCU | Ohio State | 61.7% | Wrong |
 | M1 | (1) Michigan vs (16) Howard | 101-80 | Michigan | Michigan | 92.9% | Correct |
 | M8 | (2) Iowa State vs (15) Tennessee State | 108-74 | Iowa State | Iowa State | 97.3% | Correct |
@@ -37,14 +39,16 @@ A live tournament prediction pipeline that generates a full 63-game bracket, tra
 | S3 | (5) Vanderbilt vs (12) McNeese | 78-68 | Vanderbilt | Vanderbilt | 82.8% | Correct |
 | S7 | (7) Saint Mary's vs (10) Texas A&M | 50-63 | Texas A&M | Saint Mary's | 60.7% | Wrong |
 | S5 | (6) North Carolina vs (11) VCU | 78-82 | VCU | North Carolina | 59.7% | Wrong |
+| S2 | (8) Clemson vs (9) Iowa | 61-67 | Iowa | Iowa | 57.9% | Correct |
 | W1 | (1) Arizona vs (16) Long Island University | 92-58 | Arizona | Arizona | 98.6% | Correct |
+| W8 | (2) Purdue vs (15) Queens (NC) | 104-71 | Purdue | Purdue | 96.9% | Correct |
 | W6 | (3) Gonzaga vs (14) Kennesaw State | 73-64 | Gonzaga | Gonzaga | 94.8% | Correct |
 | W4 | (4) Arkansas vs (13) Hawaii | 97-78 | Arkansas | Arkansas | 89.3% | Correct |
 | W3 | (5) Wisconsin vs (12) High Point | 82-83 | High Point | Wisconsin | 82.9% | Wrong |
 | W5 | (6) BYU vs (11) Texas | 71-79 | Texas | BYU | 50.9% | Wrong |
 | W2 | (8) Villanova vs (9) Utah State | 76-86 | Utah State | Utah State | 51.3% | Correct |
 
-**Record: 17/23 (73.9%) | Upsets caught: 1/7 | All misses were upsets**
+**Record: 21/27 (77.8%) | Upsets caught: 2/8 | All misses were upsets**
 <!-- ACCURACY_END -->
 
 ## How It Works
