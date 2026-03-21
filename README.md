@@ -5,13 +5,13 @@ A live tournament prediction pipeline that generates a full 63-game bracket, tra
 <!-- ACCURACY_START -->
 ## Tournament Accuracy Tracker
 
-*Last updated: 2026-03-21T04:45:35Z*
+*Last updated: 2026-03-21T16:33:22Z*
 
 | Metric | Value |
 |--------|-------|
-| Games tracked | 29 |
-| Correct picks | 23/29 |
-| Accuracy | 79.3% |
+| Games tracked | 30 |
+| Correct picks | 24/30 |
+| Accuracy | 80.0% |
 | Upsets caught | 2/8 |
 
 ![Accuracy Dashboard](images/accuracy_dashboard.png)
@@ -21,6 +21,7 @@ A live tournament prediction pipeline that generates a full 63-game bracket, tra
 | Game | Matchup | Score | Winner | Our Pick | Confidence | Result |
 |------|---------|-------|--------|----------|------------|--------|
 | E1 | (1) Duke vs (16) Siena | 71-65 | Duke | Duke | 98.4% | Correct |
+| E8 | (2) UConn vs (15) Furman | 82-71 | UConn | UConn | 95.9% | Correct |
 | E6 | (3) Michigan State vs (14) North Dakota State | 92-67 | Michigan State | Michigan State | 91.9% | Correct |
 | E4 | (4) Kansas vs (13) Cal Baptist | 68-60 | Kansas | Kansas | 87.2% | Correct |
 | E3 | (5) St. John's vs (12) Northern Iowa | 79-53 | St. John's | St. John's | 81.1% | Correct |
@@ -50,7 +51,7 @@ A live tournament prediction pipeline that generates a full 63-game bracket, tra
 | W5 | (6) BYU vs (11) Texas | 71-79 | Texas | BYU | 50.9% | Wrong |
 | W2 | (8) Villanova vs (9) Utah State | 76-86 | Utah State | Utah State | 51.3% | Correct |
 
-**Record: 23/29 (79.3%) | Upsets caught: 2/8 | All misses were upsets**
+**Record: 24/30 (80.0%) | Upsets caught: 2/8 | All misses were upsets**
 <!-- ACCURACY_END -->
 
 ## How It Works
