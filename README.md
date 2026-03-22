@@ -5,7 +5,7 @@ A live tournament prediction pipeline that generates a full 63-game bracket, tra
 <!-- ACCURACY_START -->
 ## Tournament Accuracy Tracker
 
-*Last updated: 2026-03-22T22:28:52Z*
+*Last updated: 2026-03-22T22:56:02Z*
 
 | Metric | Value |
 |--------|-------|
