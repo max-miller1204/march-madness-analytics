@@ -52509,6 +52509,321 @@
         "total_ev_predicted": 238.91,
         "total_ev_actual": 240.0
       }
+    },
+    {
+      "timestamp": "2026-03-27T16:58:50Z",
+      "round": "Round of 64",
+      "games_completed": 30,
+      "predictions": [
+        {
+          "game_id": "E1",
+          "predicted_winner": "Duke",
+          "predicted_prob": 0.9842,
+          "actual_winner": "Duke",
+          "correct": true,
+          "ev_predicted": 9.84,
+          "ev_actual": 10,
+          "upset": false
+        },
+        {
+          "game_id": "E8",
+          "predicted_winner": "UConn",
+          "predicted_prob": 0.9592,
+          "actual_winner": "UConn",
+          "correct": true,
+          "ev_predicted": 9.59,
+          "ev_actual": 10,
+          "upset": false
+        },
+        {
+          "game_id": "E6",
+          "predicted_winner": "Michigan State",
+          "predicted_prob": 0.9186,
+          "actual_winner": "Michigan State",
+          "correct": true,
+          "ev_predicted": 9.19,
+          "ev_actual": 10,
+          "upset": false
+        },
+        {
+          "game_id": "E4",
+          "predicted_winner": "Kansas",
+          "predicted_prob": 0.8724,
+          "actual_winner": "Kansas",
+          "correct": true,
+          "ev_predicted": 8.72,
+          "ev_actual": 10,
+          "upset": false
+        },
+        {
+          "game_id": "E3",
+          "predicted_winner": "St. John's",
+          "predicted_prob": 0.8107,
+          "actual_winner": "St. John's",
+          "correct": true,
+          "ev_predicted": 8.11,
+          "ev_actual": 10,
+          "upset": false
+        },
+        {
+          "game_id": "E5",
+          "predicted_winner": "Louisville",
+          "predicted_prob": 0.7295,
+          "actual_winner": "Louisville",
+          "correct": true,
+          "ev_predicted": 7.29,
+          "ev_actual": 10,
+          "upset": false
+        },
+        {
+          "game_id": "E7",
+          "predicted_winner": "UCLA",
+          "predicted_prob": 0.6696,
+          "actual_winner": "UCLA",
+          "correct": true,
+          "ev_predicted": 6.7,
+          "ev_actual": 10,
+          "upset": false
+        },
+        {
+          "game_id": "E2",
+          "predicted_winner": "Ohio State",
+          "predicted_prob": 0.6165,
+          "actual_winner": "TCU",
+          "correct": false,
+          "ev_predicted": 6.17,
+          "ev_actual": 0.0,
+          "upset": true
+        },
+        {
+          "game_id": "M1",
+          "predicted_winner": "Michigan",
+          "predicted_prob": 0.929,
+          "actual_winner": "Michigan",
+          "correct": true,
+          "ev_predicted": 9.29,
+          "ev_actual": 10,
+          "upset": false
+        },
+        {
+          "game_id": "M8",
+          "predicted_winner": "Iowa State",
+          "predicted_prob": 0.9733,
+          "actual_winner": "Iowa State",
+          "correct": true,
+          "ev_predicted": 9.73,
+          "ev_actual": 10,
+          "upset": false
+        },
+        {
+          "game_id": "M6",
+          "predicted_winner": "Virginia",
+          "predicted_prob": 0.9288,
+          "actual_winner": "Virginia",
+          "correct": true,
+          "ev_predicted": 9.29,
+          "ev_actual": 10,
+          "upset": false
+        },
+        {
+          "game_id": "M4",
+          "predicted_winner": "Alabama",
+          "predicted_prob": 0.8465,
+          "actual_winner": "Alabama",
+          "correct": true,
+          "ev_predicted": 8.46,
+          "ev_actual": 10,
+          "upset": false
+        },
+        {
+          "game_id": "M3",
+          "predicted_winner": "Texas Tech",
+          "predicted_prob": 0.7829,
+          "actual_winner": "Texas Tech",
+          "correct": true,
+          "ev_predicted": 7.83,
+          "ev_actual": 10,
+          "upset": false
+        },
+        {
+          "game_id": "M2",
+          "predicted_winner": "Georgia",
+          "predicted_prob": 0.5639,
+          "actual_winner": "Saint Louis",
+          "correct": false,
+          "ev_predicted": 5.64,
+          "ev_actual": 0.0,
+          "upset": true
+        },
+        {
+          "game_id": "M7",
+          "predicted_winner": "Kentucky",
+          "predicted_prob": 0.55,
+          "actual_winner": "Kentucky",
+          "correct": true,
+          "ev_predicted": 5.5,
+          "ev_actual": 10,
+          "upset": false
+        },
+        {
+          "game_id": "S8",
+          "predicted_winner": "Houston",
+          "predicted_prob": 0.9684,
+          "actual_winner": "Houston",
+          "correct": true,
+          "ev_predicted": 9.68,
+          "ev_actual": 10,
+          "upset": false
+        },
+        {
+          "game_id": "S6",
+          "predicted_winner": "Illinois",
+          "predicted_prob": 0.9614,
+          "actual_winner": "Illinois",
+          "correct": true,
+          "ev_predicted": 9.61,
+          "ev_actual": 10,
+          "upset": false
+        },
+        {
+          "game_id": "S4",
+          "predicted_winner": "Nebraska",
+          "predicted_prob": 0.9311,
+          "actual_winner": "Nebraska",
+          "correct": true,
+          "ev_predicted": 9.31,
+          "ev_actual": 10,
+          "upset": false
+        },
+        {
+          "game_id": "S3",
+          "predicted_winner": "Vanderbilt",
+          "predicted_prob": 0.8278,
+          "actual_winner": "Vanderbilt",
+          "correct": true,
+          "ev_predicted": 8.28,
+          "ev_actual": 10,
+          "upset": false
+        },
+        {
+          "game_id": "S7",
+          "predicted_winner": "Saint Mary's",
+          "predicted_prob": 0.6069,
+          "actual_winner": "Texas A&M",
+          "correct": false,
+          "ev_predicted": 6.07,
+          "ev_actual": 0.0,
+          "upset": true
+        },
+        {
+          "game_id": "S5",
+          "predicted_winner": "North Carolina",
+          "predicted_prob": 0.5965,
+          "actual_winner": "VCU",
+          "correct": false,
+          "ev_predicted": 5.96,
+          "ev_actual": 0.0,
+          "upset": true
+        },
+        {
+          "game_id": "S2",
+          "predicted_winner": "Iowa",
+          "predicted_prob": 0.5789,
+          "actual_winner": "Iowa",
+          "correct": true,
+          "ev_predicted": 5.79,
+          "ev_actual": 10,
+          "upset": true
+        },
+        {
+          "game_id": "W1",
+          "predicted_winner": "Arizona",
+          "predicted_prob": 0.9857,
+          "actual_winner": "Arizona",
+          "correct": true,
+          "ev_predicted": 9.86,
+          "ev_actual": 10,
+          "upset": false
+        },
+        {
+          "game_id": "W8",
+          "predicted_winner": "Purdue",
+          "predicted_prob": 0.9686,
+          "actual_winner": "Purdue",
+          "correct": true,
+          "ev_predicted": 9.69,
+          "ev_actual": 10,
+          "upset": false
+        },
+        {
+          "game_id": "W6",
+          "predicted_winner": "Gonzaga",
+          "predicted_prob": 0.9475,
+          "actual_winner": "Gonzaga",
+          "correct": true,
+          "ev_predicted": 9.47,
+          "ev_actual": 10,
+          "upset": false
+        },
+        {
+          "game_id": "W4",
+          "predicted_winner": "Arkansas",
+          "predicted_prob": 0.8926,
+          "actual_winner": "Arkansas",
+          "correct": true,
+          "ev_predicted": 8.93,
+          "ev_actual": 10,
+          "upset": false
+        },
+        {
+          "game_id": "W3",
+          "predicted_winner": "Wisconsin",
+          "predicted_prob": 0.8286,
+          "actual_winner": "High Point",
+          "correct": false,
+          "ev_predicted": 8.29,
+          "ev_actual": 0.0,
+          "upset": true
+        },
+        {
+          "game_id": "W7",
+          "predicted_winner": "Miami (FL)",
+          "predicted_prob": 0.6399,
+          "actual_winner": "Miami (FL)",
+          "correct": true,
+          "ev_predicted": 6.4,
+          "ev_actual": 10,
+          "upset": false
+        },
+        {
+          "game_id": "W5",
+          "predicted_winner": "BYU",
+          "predicted_prob": 0.509,
+          "actual_winner": "Texas",
+          "correct": false,
+          "ev_predicted": 5.09,
+          "ev_actual": 0.0,
+          "upset": true
+        },
+        {
+          "game_id": "W2",
+          "predicted_winner": "Utah State",
+          "predicted_prob": 0.5132,
+          "actual_winner": "Utah State",
+          "correct": true,
+          "ev_predicted": 5.13,
+          "ev_actual": 10,
+          "upset": true
+        }
+      ],
+      "summary": {
+        "accuracy": 0.8,
+        "brier_score": 0.1164,
+        "upsets_predicted_correctly": 2,
+        "upsets_missed": 6,
+        "total_ev_predicted": 238.91,
+        "total_ev_actual": 240.0
+      }
     }
   ]
 }
